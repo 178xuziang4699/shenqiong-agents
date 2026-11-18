@@ -1,0 +1,32 @@
+name: summarize_notes
+version: 0.1.0
+description: 从原始笔记文本中抽取要点摘要（去噪、排序、截断）
+entry: skill.py:run
+
+# 运行时按触发条件匹配后动态加载；主流程不出现 if skill == "xxx" 这类硬编码
+triggers:
+  intents: [content_report]
+  keywords: [摘要, 总结, 整理, 笔记, 要点, 提炼]
+  regex: ["(整理|提炼).*(笔记|素材)"]
+  require_all: false
+
+inputs:
+  type: object
+  required: [text]
+  properties:
+    text: {type: string, minLength: 1}
+    max_points: {type: integer, minimum: 1, maximum: 20}
+
+dependencies:
+  tools: []          # 本技能不直接调工具，输入由管理者在流水线前一步准备好
+
+permissions: read
+timeout_seconds: 30
+
+# 技能市场目录元数据（不影响原有加载契约）
+category: 文本处理
+color: "#2563eb"
+origin: local
+sample_args:
+  text: "报销制度要求 30 天内提交。审批链路按金额分三档。超时 48 小时自动提醒。结论：必须附发票。"
+  max_points: 3

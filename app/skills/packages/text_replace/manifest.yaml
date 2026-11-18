@@ -1,0 +1,32 @@
+name: text_replace
+version: 1.0.0
+description: 按术语映射批量替换
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 替换
+  - 改写
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    text:
+      type: string
+      description: 参数 text
+    mapping:
+      type: object
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 文本处理
+color: '#2563eb'
+sample_args:
+  text: 审批通过后报销完成
+  mapping:
+    审批: 审核
+    报销: 费用报销
+origin: local

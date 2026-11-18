@@ -1,0 +1,26 @@
+name: browser_browse
+version: 1.0.0
+description: 用真实浏览器（Playwright 驱动 Chromium）渲染网页，取回执行 JS 后的标题、正文与链接
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords: [浏览器渲染, 渲染网页, 打开网页, 真实浏览器]
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: [url]
+  properties:
+    url:
+      type: string
+      description: 以 http:// 或 https:// 开头的网页地址
+    limit:
+      type: integer
+permissions: read
+timeout_seconds: 30
+category: 信息采集
+color: '#7c3aed'
+sample_args:
+  url: http://127.0.0.1:8000/health
+  limit: 300
+origin: local

@@ -1,0 +1,33 @@
+name: code_generate
+version: 1.0.0
+description: 按需求生成完整可运行代码（接入模型时由模型生成，离线时降级为确定性模板并如实标注）
+entry: skill.py:run
+triggers:
+  intents: [code_gen]
+  keywords: [写代码, 代码, 函数, 脚本, 程序, 开发, 实现, 单元测试]
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    spec:
+      type: string
+      description: 代码需求描述
+    language:
+      type: string
+      description: 目标语言 python / javascript / html
+    filename:
+      type: string
+      description: 目标文件路径
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 60
+category: 代码工程
+color: '#7c3aed'
+sample_args:
+  spec: 写一个 Python 函数计算斐波那契数列前 N 项，带单元测试
+  language: python
+  filename: output/fib.py
+origin: local

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>运维管理 · Agent Platform</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --card:#fff; --line:#e6e8ec; --text:#1f2329;
+    --sub:#6b7280; --brand:#2f6bff; --ok:#16a34a; --warn:#d97706; --err:#dc2626;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);
+    font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+  header{background:var(--card);border-bottom:1px solid var(--line);padding:14px 22px;
+    display:flex;align-items:center;gap:16px;flex-wrap:wrap;position:sticky;top:0;z-index:10}
+  header h1{font-size:16px;margin:0;font-weight:650}
+  header .sub{color:var(--sub);font-size:12px}
+  .spacer{flex:1}
+  a.back{color:var(--brand);text-decoration:none;font-size:13px}
+  a.back:hover{text-decoration:underline}
+  select,button,input{font:inherit;border:1px solid var(--line);border-radius:8px;
+    padding:7px 11px;background:#fff;color:var(--text)}
+  button{cursor:pointer}
+  button.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+  button:hover{filter:brightness(.97)}
+  main{max-width:1180px;margin:0 auto;padding:20px 22px 60px}
+  .toolbar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:16px}
+  .toolbar label{color:var(--sub);font-size:12px}
+  nav.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:16px}
+  nav.tabs button{background:#fff}
+  nav.tabs button.on{background:var(--brand);border-color:var(--brand);color:#fff}
+  .panel{display:none;background:var(--card);border:1px solid var(--line);
+    border-radius:12px;padding:18px 20px;min-height:220px}
+  .panel.on{display:block}
+  .panel h2{font-size:15px;margin:0 0 4px}
+  .panel .hint{color:var(--sub);font-size:12px;margin:0 0 14px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{color:var(--sub);font-weight:600;background:#fafbfc;white-space:nowrap}
+  td.mono,pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:12px}
+  pre{white-space:pre-wrap;word-break:break-all;background:#f8f9fb;border:1px solid var(--line);
+    border-radius:8px;padding:10px;margin:6px 0;max-height:340px;overflow:auto}
+  .tag{display:inline-block;padding:1px 7px;border-radius:999px;font-size:11px;
+    background:#eef2ff;color:#3730a3}
+  .tag.ok{background:#dcfce7;color:#15803d}
+  .tag.fail{background:#fee2e2;color:#b91c1c}
+  .tag.skip{background:#fef3c7;color:#92400e}
+  .empty{color:var(--sub);padding:24px 0;text-align:center}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px}
+  .kv{background:#fafbfc;border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+  .kv b{display:block;font-size:12px;color:var(--sub);font-weight:600}
+  .err{color:var(--err)}
+  .ok{color:var(--ok)}
+  .flow{white-space:pre-wrap;font-family:ui-monospace,monospace;font-size:12px;line-height:1.8}
+  @media(max-width:700px){main{padding:14px}header{padding:12px 14px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>运维管理</h1>
+  <span class="sub">执行过程 · 流转图 · 诊断恢复 · 能力目录</span>
+  <span class="spacer"></span>
+  <a class="back" id="lnk-home" href="/">← 返回对话主页</a>
+</header>
+
+<main>
+  <div class="toolbar">
+    <label for="sel-session">会话</label>
+    <select id="sel-session" style="min-width:300px"><option value="">加载中…</option></select>
+    <button id="btn-refresh">刷新数据</button>
+    <span class="sub" id="status-line"></span>
+  </div>
+
+  <nav class="tabs" id="tabs">
+    <button data-p="chain" class="on">执行链（真实快照）</button>
+    <button data-p="tasks">任务与作业</button>
+    <button data-p="flow">流转图</button>
+    <button data-p="diag">诊断 / 恢复</button>
+    <button data-p="logs">结构化日志</button>
+    <button data-p="audit">工具审计</button>
+    <button data-p="catalog">工具与技能</button>
+    <button data-p="kb">资料库</button>
+  </nav>
+
+  <section class="panel on" data-p="chain">
+    <h2>执行链 · 每一步的上下文快照</h2>
+    <p class="hint">由 Tracer 逐步落盘，成功 / 失败 / 中断都写；这是任务执行过程的原始证据，不是前端推断摘要。</p>
+    <div id="chain-body"><div class="empty">选择会话后加载</div></div>
+  </section>
+
+  <section class="panel" data-p="tasks">
+    <h2>任务与作业</h2>
+    <p class="hint">计划、子任务状态、指派、依赖与验收标准。</p>
+    <div id="tasks-body"><div class="empty">选择会话后加载</div></div>
+  </section>
+
+  <section class="panel" data-p="flow">
+    <h2>Agent 流转图</h2>
+    <p class="hint">每一次派发 / 回传 / 打回 / 换人 / 上报都记录 (from → to, 原因)。</p>
+    <div id="flow-body"><div class="empty">选择会话后加载</div></div>
+  </section>
+
+  <section class="panel" data-p="diag">
+    <h2>诊断与断点恢复</h2>
+    <p class="hint">最后成功步 / 首个失败点 / 错误归类 / 建议动作；可在此一键续跑。</p>
+    <div id="diag-body"><div class="empty">选择会话后加载</div></div>
+    <div style="margin-top:14px"><button class="primary" id="btn-resume">诊断并断点续跑</button></div>
+    <pre id="resume-out" style="display:none"></pre>
+  </section>
+
+  <section class="panel" data-p="logs">
+    <h2>结构化日志</h2><p class="hint">含 level / step_index / agent_id / error_code，便于取证。</p>
+    <div id="logs-body"><div class="empty">选择会话后加载</div></div>
+  </section>
+
+  <section class="panel" data-p="audit">
+    <h2>工具调用审计</h2><p class="hint">每次工具调用的入参、结果、耗时与权限判定。</p>
+    <div id="audit-body"><div class="empty">选择会话后加载</div></div>
+  </section>
+
+  <section class="panel" data-p="catalog">
+    <h2>工具与技能注册表</h2><p class="hint">平台当前真实注册的能力清单（非静态展示）。</p>
+    <div id="catalog-body"><div class="empty">加载中…</div></div>
+  </section>
+
+  <section class="panel" data-p="kb">
+    <h2>资料库检索</h2>
+    <div class="toolbar" style="margin-bottom:10px">
+      <input id="kb-q" placeholder="输入检索词，如 报销 / 审批" style="flex:1;min-width:200px">
+      <button id="btn-kb">检索</button>
+    </div>
+    <div id="kb-body"><div class="empty">尚未检索</div></div>
+  </section>
+</main>
+
+<script>
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => (
+  {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const SHARE = new URLSearchParams(location.search).get('sharecode');
+if (SHARE) $('#lnk-home').href = '/?sharecode=' + encodeURIComponent(SHARE);
+
+function url(p) {
+  const u = new URL(p, location.origin);
+  if (SHARE) u.searchParams.set('sharecode', SHARE);
+  return u.pathname + u.search;
+}
+async function api(p, opt = {}) {
+  const r = await fetch(url(p), {headers:{'Content-Type':'application/json'}, ...opt});
+  const t = await r.text();
+  let b; try { b = t ? JSON.parse(t) : {}; } catch (e) { b = {raw:t}; }
+  if (!r.ok) throw new Error((b.detail && b.detail.message) || b.message || r.status);
+  return b;
+}
+function short(v, n = 220) {
+  let s = typeof v === 'string' ? v : JSON.stringify(v, null, 1);
+  if (!s) return '';
+  return s.length > n ? s.slice(0, n) + ' …' : s;
+}
+function tag(status) {
+  const s = String(status || '');
+  const cls = /ok|done|completed|success|pass/.test(s) ? 'ok'
+    : /fail|error|interrupt|reject/.test(s) ? 'fail'
+    : /skip|block|pending/.test(s) ? 'skip' : '';
+  return `<span class="tag ${cls}">${esc(s || '-')}</span>`;
+}
+function table(headers, rows) {
+  if (!rows || !rows.length) return '<div class="empty">暂无数据</div>';
+  return `<table><thead><tr>${headers.map(h => `<th>${esc(h)}</th>`).join('')}</tr></thead>
+    <tbody>${rows.join('')}</tbody></table>`;
+}
+function tr(cells) { return `<tr>${cells.map(c => `<td>${c}</td>`).join('')}</tr>`; }
+function fail(el, e) { $(el).innerHTML = `<div class="empty err">${esc(e.message || e)}</div>`; }
+
+let SID = '';
+
+async function loadSessions() {
+  try {
+    const list = await api('/api/sessions?limit=100');
+    const sel = $('#sel-session');
+    if (!list.length) { sel.innerHTML = '<option value="">（暂无会话）</option>'; return; }
+    sel.innerHTML = list.map(s =>
+      `<option value="${esc(s.session_id)}">${esc(s.session_id)} · ${esc(s.mode)} · ${esc(s.status)}</option>`).join('');
+    // 默认定位到办事会话，打开就能看到完整的多 Agent 执行链
+    const taskOne = list.find(s => s.mode === 'task');
+    SID = taskOne ? taskOne.session_id : list[0].session_id;
+    sel.value = SID;
+  } catch (e) { $('#sel-session').innerHTML = '<option value="">加载失败</option>'; }
+}
+
+async function loadChain() {
+  try {
+    const d = await api(`/api/sessions/${encodeURIComponent(SID)}/replay`);
+    const chain = d.chain || [];
+    const rows = chain.map(x => tr([
+      `<b>${esc(x.step_index)}</b>`, `<span class="mono">${esc(x.agent_id)}</span>`,
+      `<span class="mono">${esc(x.phase)}</span>`, tag(x.status),
+      `<details><summary>查看</summary><pre>输入: ${esc(short(x.input))}\n输出: ${esc(short(x.output))}${x.error ? '\n错误: ' + esc(short(x.error)) : ''}${x.handoff ? '\n流转: ' + esc(short(x.handoff)) : ''}</pre></details>`,
+    ]));
+    $('#chain-body').innerHTML =
+      `<p class="hint">共 <b>${chain.length}</b> 步 · 会话 ${esc(SID)}</p>` +
+      table(['步号', 'Agent', '阶段', '状态', '输入 / 输出'], rows);
+  } catch (e) { fail('#chain-body', e); }
+}
+
+async function loadTasks() {
+  try {
+    const d = await api(`/api/sessions/${encodeURIComponent(SID)}/tasks`);
+    const plan = d.plan || {};
+    const subs = plan.subtasks || [];
+    const rows = subs.map(t => tr([
+      `<b>${esc(t.task_id)}</b>`, esc(t.title), `<span class="mono">${esc(t.assignee)}</span>`,
+      esc((t.depends_on || []).join(', ') || '-'), esc((t.acceptance || []).join('；') || '-'),
+    ]));
+    let html = `<p class="hint">计划意图：<b>${esc(plan.intent || '-')}</b> · 子任务 ${subs.length} 个</p>`;
+    html += table(['任务', '标题', '指派', '依赖', '验收标准'], rows);
+    if (d.tasks && d.tasks.length) {
+      html += '<h2 style="margin-top:20px;font-size:14px">落库任务状态</h2>' + table(
+        ['任务', '状态', '尝试次数', '作业 / 说明'],
+        d.tasks.map(t => tr([esc(t.task_id), tag(t.status), esc(t.attempts ?? '-'),
+          `<span class="mono">${esc(short(t.jobs || t.title))}</span>`])));
+    }
+    $('#tasks-body').innerHTML = html;
+  } catch (e) { fail('#tasks-body', e); }
+}
+
+async function loadFlow() {
+  try {
+    const d = await api(`/api/sessions/${encodeURIComponent(SID)}/graph`);
+    $('#flow-body').innerHTML = `<div class="flow">${esc(d.graph || d.text || JSON.stringify(d, null, 2))}</div>`;
+  } catch (e) { fail('#flow-body', e); }
+}
+
+async function loadDiag() {
+  try {
+    const d = await api(`/api/sessions/${encodeURIComponent(SID)}/diagnose`);
+    const items = [
+      ['会话状态', d.session_status], ['错误归类', `${d.error_class} · ${d.error_class_desc || ''}`],
+      ['错误信息', d.error_message], ['未处理异常', d.unhandled_error ? '是' : '否'],
+      ['建议动作', d.suggested_action], ['可恢复', d.resumable ? '是' : '否'],
+      ['快照 / 归档 / 日志', `${d.snapshot_rows} / ${d.archived_rows} / ${d.log_rows}`],
+      ['最后成功步', d.last_success ? `step ${d.last_success.step_index} · ${d.last_success.phase}` : '无'],
+      ['首个失败点', d.first_failure ? `step ${d.first_failure.step_index} · ${d.first_failure.phase}` : '无'],
+    ];
+    $('#diag-body').innerHTML = '<div class="grid">' + items.map(([k, v]) =>
+      `<div class="kv"><b>${esc(k)}</b>${esc(v ?? '-')}</div>`).join('') + '</div>' +
+      (d.report ? `<pre>${esc(d.report)}</pre>` : '');
+  } catch (e) { fail('#diag-body', e); }
+}
+
+async function loadLogs() {
+  try {
+    const d = await api(`/api/sessions/${encodeURIComponent(SID)}/logs?limit=300`);
+    const logs = d.logs || d || [];
+    $('#logs-body').innerHTML = table(['级别', '步号', '模块 / Agent', '错误码', '消息'],
+      logs.map(l => tr([tag(l.level), esc(l.step_index), esc(l.module || l.agent_id),
+        `<span class="mono">${esc(l.error_code || '-')}</span>`, esc(l.message)])));
+  } catch (e) { fail('#logs-body', e); }
+}
+
+async function loadAudit() {
+  try {
+    const d = await api(`/api/sessions/${encodeURIComponent(SID)}/audit`);
+    const rows = d.audit || d.rows || d || [];
+    $('#audit-body').innerHTML = table(['工具', '状态', 'Agent', '耗时(ms)', '权限 / 参数摘要'],
+      (Array.isArray(rows) ? rows : []).map(a => tr([
+        `<span class="mono">${esc(a.tool || a.name)}</span>`, tag(a.status), esc(a.agent_id),
+        esc(a.duration_ms ?? '-'),
+        `<span class="mono">${esc(a.permission || '')} · ${esc(short(a.args_digest || a.args || ''))}</span>`])));
+  } catch (e) { fail('#audit-body', e); }
+}
+
+async function loadCatalog() {
+  try {
+    const [tools, skills] = await Promise.all([api('/api/tools'), api('/api/skills')]);
+    $('#catalog-body').innerHTML =
+      `<p class="hint">工具 <b>${tools.length}</b> 个 · 技能 <b>${skills.length}</b> 个</p>` +
+      '<h2 style="font-size:14px;margin-top:14px">工具</h2>' +
+      table(['名称', '来源', '说明'], tools.map(t => tr([
+        `<span class="mono">${esc(t.name)}</span>`, esc(t.server || t.source || '-'), esc(t.description || '')]))) +
+      '<h2 style="font-size:14px;margin-top:18px">技能</h2>' +
+      table(['名称', '中文说明'], skills.map(s => tr([
+        `<span class="mono">${esc(s.name)}</span>`,
+        esc(s.zh_desc || s.display_name || s.description || '')])));
+  } catch (e) { fail('#catalog-body', e); }
+}
+
+async function loadKb() {
+  const q = $('#kb-q').value.trim();
+  try {
+    const d = await api(`/api/knowledge?q=${encodeURIComponent(q)}&top_k=5`);
+    const hits = (d.search && d.search.hits) || d.hits || [];
+    const docs = d.documents || [];
+    $('#kb-body').innerHTML =
+      `<p class="hint">已入库文档 ${docs.length} 份 · 切块 ${d.chunk_count ?? 0} 个 · 命中 ${hits.length} 条</p>` +
+      (hits.length
+        ? table(['来源', '相关度', '内容'], hits.map(h => tr([
+            esc(h.citation || h.source || '-'), esc(h.score ?? '-'), esc(short(h.content, 300))])))
+        : table(['来源', '标题', '切块'], docs.map(x => tr([
+            esc(x.source), esc(x.title || '-'), esc(x.chunks ?? '-')]))));
+  } catch (e) { fail('#kb-body', e); }
+}
+
+const LOADERS = {chain:loadChain, tasks:loadTasks, flow:loadFlow, diag:loadDiag,
+  logs:loadLogs, audit:loadAudit, catalog:loadCatalog, kb:loadKb};
+
+async function loadCurrent() {
+  const p = $$('#tabs button.on')[0]?.dataset.p || 'chain';
+  $('#status-line').textContent = SID ? `当前会话：${SID}` : '暂无会话';
+  if (p === 'catalog' || p === 'kb') { await LOADERS[p](); return; }
+  if (!SID) return;
+  await LOADERS[p]();
+}
+
+async function loadAll() {
+  await loadSessions();
+  await Promise.allSettled(Object.values(LOADERS).map(f => f()));
+  $('#status-line').textContent = SID ? `已加载 · ${SID}` : '暂无会话';
+}
+
+$$('#tabs button').forEach(b => b.onclick = () => {
+  $$('#tabs button').forEach(x => x.classList.toggle('on', x === b));
+  const p = b.dataset.p;
+  $$('.panel').forEach(x => x.classList.toggle('on', x.dataset.p === p));
+  loadCurrent();
+});
+$('#sel-session').onchange = e => { SID = e.target.value; loadAll(); };
+$('#btn-refresh').onclick = loadAll;
+$('#btn-kb').onclick = loadKb;
+$('#btn-resume').onclick = async () => {
+  if (!SID) return;
+  const out = $('#resume-out');
+  out.style.display = 'block'; out.textContent = '正在诊断并续跑…';
+  try {
+    const d = await api(`/api/sessions/${encodeURIComponent(SID)}/resume`, {method:'POST'});
+    out.textContent = d.report || JSON.stringify(d, null, 2);
+    await loadAll();
+  } catch (e) { out.textContent = '失败：' + e.message; }
+};
+loadAll();
+</script>
+</body>
+</html>

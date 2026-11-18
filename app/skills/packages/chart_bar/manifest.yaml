@@ -1,0 +1,37 @@
+name: chart_bar
+version: 1.0.0
+description: 用 matplotlib 生成柱状图 PNG
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 图表
+  - 可视化
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    labels:
+      type: array
+    values:
+      type: array
+dependencies:
+  tools: []
+permissions: write
+timeout_seconds: 30
+category: 文档与文件
+color: '#d97706'
+sample_args:
+  labels:
+  - Chat
+  - Task
+  - Resume
+  - Diagnose
+  values:
+  - 12
+  - 9
+  - 4
+  - 7
+origin: local

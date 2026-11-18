@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Agent Platform · 新建任务</title>
+<link rel="stylesheet" href="/static/app.css">
+</head>
+<body>
+
+<main class="layout">
+  <!-- ============ 左侧导航 ============ -->
+  <aside>
+    <div class="side-top">
+      <div class="brand-mini">
+        <div class="logo">A</div>
+        <b>Agent Platform</b>
+      </div>
+      <div class="side-tools">
+        <button class="icon-btn" id="btn-collapse" title="折叠侧栏">&#9776;</button>
+        <button class="icon-btn" id="btn-search" title="搜索会话">&#9906;</button>
+      </div>
+    </div>
+
+    <div class="search-box" id="search-box" style="display:none">
+      <input id="search-input" placeholder="筛选会话…" autocomplete="off">
+    </div>
+
+    <nav class="nav" id="nav">
+      <button class="nav-item on" data-view="home">
+        <span class="ni">&#8853;</span>新建任务</button>
+      <button class="nav-item" data-view="skills">
+        <span class="ni">&#9638;</span>专家技能和浏览器</button>
+      <button class="nav-item" data-view="library">
+        <span class="ni">&#9636;</span>资料库</button>
+      <button class="nav-item" data-view="more">
+        <span class="ni">&#8943;</span>更多</button>
+    </nav>
+
+    <div class="recent-head">最近</div>
+    <ul class="sessions" id="sessions"></ul>
+    <div class="side-foot" id="health"><span class="dot wait"></span>连接中…</div>
+    <div class="side-foot" style="padding-top:0"><a data-admin-link href="/admin" style="color:var(--mut);text-decoration:none;font-size:12px">⚙ 运维管理</a></div>
+  </aside>
+
+  <!-- ============ 右侧主区 ============ -->
+  <section class="main">
+
+    <!-- 手机端顶栏：窄屏侧栏隐藏时，仍可切换两个入口（桌面端不显示） -->
+    <div class="m-topbar" id="m-topbar">
+      <div class="m-brand"><span class="m-logo">A</span><b>智能体 Agent</b></div>
+      <div class="m-nav">
+        <button data-mview="home" class="on">新建任务</button>
+        <button data-mview="catalog">专家技能和浏览器</button>
+      </div>
+    </div>
+
+    <!-- ---------- 视图 A：新建任务首页 ---------- -->
+    <div class="view on" id="view-home">
+      <div class="home-wrap">
+        <div class="home-clock"><span id="hc-date">—</span><b id="hc-time">—</b></div>
+      <div class="home-api-row">
+          <button id="btn-home-api" class="home-api-btn" title="接入自己的大模型 API">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor"
+                 stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M9 3v5M15 3v5M6 8h12v3a6 6 0 0 1-6 6 6 6 0 0 1-6-6zM12 17v4"/>
+            </svg>
+            <span id="home-api-label">添加我的 API</span>
+          </button>
+        </div>
+        <h1 class="home-title">Agent Platform，我帮你</h1>
+        <p class="home-sub">两套通道互相隔离：选好「问答」或「办事」就行。两边都能聊天、写文档、跑多步任务；你说什么词都不会被切到另一个通道。</p>
+        <div class="home-caps" id="home-caps"></div>
+
+        <div class="mode-switch" id="mode-switch">
+          <button class="mode on" data-channel="chat"><span>&#10022;</span> 问答通道</button>
+          <button class="mode" data-channel="work"><span>&#9889;</span> 办事通道</button>
+        </div>
+        <div class="chan-hint">通道由你选择，创建会话后不可变；两边都能对话，也都能办事。</div>
+
+        <div class="composer-card" id="composer">
+          <div class="composer-top">
+            <div class="scene-tabs" id="scene-tabs">
+              <button class="scene" data-q="调研一下德国AI市场">调研报告</button>
+              <button class="scene" data-q="帮我写一份本周的工作周报">写周报</button>
+              <button class="scene" data-q="写一份项目立项方案">写方案</button>
+              <button class="scene" data-q="写一个 Python 函数计算斐波那契数列前 N 项，带单元测试，写入 output/fib.py">写代码</button>
+              <button class="scene" data-q="帮我把 samples/notes.md 整理成一份报告，写入 output/report.md">内容生产</button>
+              <button class="scene" data-q="查一下资料库里有没有关于报销的文档">资料检索</button>
+              <button class="scene" data-q="你好，最近怎么样？">日常对话</button>
+            </div>
+            <div class="composer-bot" title="总控 Agent">
+              <svg viewBox="0 0 24 24" width="21" height="21" fill="none"
+                   stroke="#667085" stroke-width="1.5" stroke-linecap="round">
+                <rect x="4" y="8" width="16" height="12" rx="3"/>
+                <path d="M12 4v4M9 4h6M8 13h.01M16 13h.01M9.5 17h5"/>
+              </svg>
+            </div>
+          </div>
+
+          <div class="prompt-helper" id="prompt-helper-home" style="display:none">
+            <div class="ph-head">
+              <span class="ph-ico">&#10024;</span>
+              <span class="ph-title">标准提示词</span>
+              <span class="ph-tag" id="ph-tag-home"></span>
+              <button class="ph-use" id="ph-use-home" type="button">采用并替换</button>
+            </div>
+            <div class="ph-body" id="ph-body-home"></div>
+          </div>
+
+          <textarea id="msg-home" rows="3"
+            placeholder="不知道做什么？在这里输入，描述想法或给指令"></textarea>
+
+          <div class="composer-bottom">
+            <button class="plus" id="btn-plus" title="更多操作">+</button>
+            <div class="composer-right">
+              <button class="route-btn" id="btn-route">通道隔离 <span>&#8964;</span></button>
+              <button class="send-btn" id="btn-send-home" title="发送">&#8593;</button>
+            </div>
+          </div>
+
+          <!-- 弹出层：加号菜单 -->
+          <div class="popover" id="pop-plus" style="display:none">
+            <div class="pop-title">快捷操作</div>
+            <button data-act="new">&#8853; 新建会话</button>
+            <button data-act="tools">&#9638; 查看工具注册表</button>
+            <button data-act="skills">&#10022; 查看技能包</button>
+            <button data-act="library">&#9636; 打开资料库</button>
+            <button data-act="routing">&#9881; 查看路由规则</button>
+          </div>
+
+          <!-- 弹出层：通道隔离说明 -->
+          <div class="popover wide" id="pop-route" style="display:none">
+            <div class="pop-title">两套隔离通道<span class="pop-close" id="pop-route-close">×</span></div>
+            <div id="route-body"><span class="spin"></span> 读取配置中…</div>
+          </div>
+        </div>
+
+        <div class="suggestions" id="suggestions">
+          <button class="sg" data-q="调研一下德国AI市场">
+            <span>调研德国 AI 市场，产出一份结构化调研报告</span><span class="arr">&#8599;</span></button>
+          <button class="sg" data-q="帮我写一份本周的工作周报">
+            <span>写一份本周工作周报，含任务表与下周计划</span><span class="arr">&#8599;</span></button>
+          <button class="sg" data-q="写一份项目立项方案">
+            <span>起草项目立项方案，含里程碑与风险应对</span><span class="arr">&#8599;</span></button>
+          <button class="sg" data-q="写一个 Python 函数计算斐波那契数列前 N 项，带单元测试，写入 output/fib.py">
+            <span>写代码：生成函数、语法自检并保存为文件</span><span class="arr">&#8599;</span></button>
+          <button class="sg" data-q="帮我把 samples/notes.md 整理成一份报告，写入 output/report.md">
+            <span>多智能体编排：笔记要点 → 报告 → 落盘 → 入库</span><span class="arr">&#8599;</span></button>
+          <button class="sg" data-q="你好，你能做什么？">
+            <span>把这个平台能做的事列出来</span><span class="arr">&#8599;</span></button>
+        </div>
+      </div>
+      <div class="home-foot">内容由多智能体协作生成，请核对关键信息 · 路由规则来自 config/routing.yaml</div>
+    </div>
+
+    <!-- ---------- 视图 B：会话详情 ---------- -->
+    <div class="view" id="view-session">
+      <div class="crumb">
+        <button id="btn-back">&#8592; 新建任务</button>
+        <span class="crumb-sep">/</span>
+        <b id="crumb-title">新对话</b>
+        <div class="chan-switch" id="chan-switch">
+          <button class="chan on" data-channel="chat">问答</button>
+          <button class="chan" data-channel="work">办事</button>
+        </div>
+        <span class="crumb-channel" id="crumb-channel">问答通道</span>
+        <span class="crumb-sid" id="crumb-sid">session: -</span>
+        <a data-admin-link href="/admin" style="margin-left:auto;color:var(--acc);text-decoration:none;font-size:12px">执行过程 / 运维管理 →</a>
+      </div>
+
+      <nav class="tabs" id="tabs">
+        <button data-tab="chat" class="on">对话 / 办事</button>
+        <button data-tab="tasks">任务与作业</button>
+        <button data-tab="chain">执行链</button>
+        <button data-tab="flow">流转图</button>
+        <button data-tab="diag">诊断 / 恢复</button>
+        <button data-tab="reg">工具与技能</button>
+        <button data-tab="library">资料库</button>
+      </nav>
+
+      <div class="panels">
+        <!-- 对话 / 办事：内容在上、输入区贴底，和 WorkBuddy 一致 -->
+        <div class="panel on" data-panel="chat">
+          <div id="answer"></div>
+          <div class="composer">
+            <div class="model-bar" id="model-bar"><span class="spin"></span> 正在检测模型…</div>
+            <div id="skill-chip" class="skill-chip-box" style="display:none"></div>
+            <div class="composer-box">
+            <div class="prompt-helper" id="prompt-helper" style="display:none">
+              <div class="ph-head">
+                <span class="ph-ico">&#10024;</span>
+                <span class="ph-title">标准提示词</span>
+                <span class="ph-tag" id="ph-tag"></span>
+                <button class="ph-use" id="ph-use" type="button">采用并替换</button>
+              </div>
+              <div class="ph-body" id="ph-body"></div>
+            </div>
+              <textarea id="msg" rows="2" placeholder="今天想做点什么？ 添加上下文，/ 调用技能与指令"></textarea>
+              <div class="composer-foot">
+                <button class="cp-plus" id="cp-plus" title="添加技能 / 上下文">+</button>
+                <span class="chips">
+                  <button class="chip" data-q="差旅报销有哪几个审批节点？">问答</button>
+                  <button class="chip" data-q="帮我把 samples/notes.md 整理成一份报告，写入 output/report.md">办事</button>
+                  <button class="chip" data-q="你好，你能做什么？">闲聊</button>
+                </span>
+                <span class="cp-grow"></span>
+                <span class="cp-model" id="cp-model">模型：检测中…</span>
+                <button class="primary cp-send" id="btn-send" title="发送">&#8593;</button>
+              </div>
+            </div>
+            <div class="cp-note">内容由 AI 生成，请核实重要信息</div>
+          </div>
+        </div>
+
+        <div class="panel" data-panel="tasks">
+          <div class="hint">两级分派结果：总控拆出的子任务（依赖 / 指派 / 验收），以及管理者二次派发的作业（动作 / 目标 / 尝试次数）。</div>
+          <div id="tasks"></div>
+        </div>
+
+        <div class="panel" data-panel="chain">
+          <div class="hint">上下文快照：每一轮对话、每一步执行都落盘，按 step_index 可完整回放。</div>
+          <div id="chain"></div>
+        </div>
+
+        <div class="panel" data-panel="flow">
+          <div class="hint">每次流转都记录 from_agent / to_agent / reason / verdict，形成可追溯的任务流转图。</div>
+          <div id="flow"></div>
+        </div>
+
+        <div class="panel" data-panel="diag">
+          <div class="row" style="margin:0 0 14px">
+            <button class="primary" id="btn-diag">一键诊断</button>
+            <button id="btn-resume">断点续跑</button>
+            <span class="hint" style="margin:0">先比对「最后成功步骤」与「错误日志」，再决定修复动作。</span>
+          </div>
+          <div id="diag"></div>
+          <h3 class="sec">最近日志</h3>
+          <div id="logs"></div>
+        </div>
+
+        <div class="panel" data-panel="reg">
+          <h3 class="sec" style="margin-top:0">MCP 工具注册表</h3>
+          <div id="tools"></div>
+          <h3 class="sec">Skills 技能包</h3>
+          <div id="skills"></div>
+        </div>
+
+        <div class="panel" data-panel="library">
+          <div class="hint">文档入库（切分 / 向量化 / 检索召回），检索结果强制带来源引用。</div>
+          <div class="kb-search">
+            <input id="kb-q" placeholder="输入检索词，例如：差旅报销审批节点">
+            <button class="primary" id="btn-kb">检索</button>
+          </div>
+          <div id="library"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------- 视图 C：技能 / 专家 / 连接器 ---------- -->
+    <div class="view" id="view-catalog">
+      <div class="cat-top">
+        <div class="cat-tabs" id="cat-tabs">
+          <button data-cat="experts">专家</button>
+          <button data-cat="skills" class="on">技能</button>
+          <button data-cat="tools">连接器</button>
+          <button data-cat="host">宿主对照</button>
+        </div>
+        <div class="cat-actions">
+          <input id="cat-q" placeholder="搜索技能或工具" autocomplete="off">
+          <button id="btn-refresh" title="重新扫描技能包目录">&#8635; 重新扫描</button>
+          <button class="primary" id="btn-add">+ 添加技能</button>
+        </div>
+      </div>
+      <div class="cat-summary" id="cat-summary"></div>
+      <div class="cat-filters" id="cat-filters"></div>
+      <div class="cat-grid" id="cat-grid"></div>
+    </div>
+
+    <!-- ---------- 视图 D：更多 / 平台能力 ---------- -->
+    <div class="view" id="view-more">
+      <div class="more-wrap">
+        <h1 class="more-title">更多 · 平台能力</h1>
+        <p class="more-sub">点一个办事场景，指令会直接发到对话里执行；过程逐步落盘、失败自动重试、中断可断点续跑，产物能直接预览与下载。</p>
+
+        <div class="more-sec-title">办事场景</div>
+        <div class="more-grid">
+          <button class="more-scene" data-q="写一个 Python 函数计算斐波那契数列前 N 项，带单元测试，写入 output/fib.py">
+            <span class="ms-ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 7L4 12l4.5 5M15.5 7L20 12l-4.5 5M13.5 4l-3 16"/></svg></span>
+            <b>写代码</b><span>按需求生成代码 → 语法自检 → 落盘，可预览下载</span>
+          </button>
+          <button class="more-scene" data-q="帮我把 samples/notes.md 整理成一份报告，写入 output/report.md">
+            <span class="ms-ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 12h6M9 16h6"/></svg></span>
+            <b>内容生产</b><span>笔记要点 → 统计 → 报告 → 写入文件 → 入库</span>
+          </button>
+          <button class="more-scene" data-q="统计一下 samples/notes.md 的字数和行数，生成统计摘要">
+            <span class="ms-ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h16M6 17v-5M11 17V7M16 17v-8M20 17V4"/></svg></span>
+            <b>数据统计</b><span>读取素材、计算指标、生成摘要，逐步可观测</span>
+          </button>
+          <button class="more-scene" data-q="查一下资料库里有没有关于报销的文档">
+            <span class="ms-ico"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M15.5 15.5L21 21"/></svg></span>
+            <b>资料检索</b><span>向量召回并强制带来源引用，不编造答案</span>
+          </button>
+        </div>
+
+        <div class="more-sec-title">快捷入口</div>
+        <div class="more-links">
+          <button data-go="api">＋ 添加我的 API</button>
+          <button data-go="skills">专家技能和浏览器</button>
+          <button data-go="library">资料库</button>
+          <button data-go="diag">诊断 / 恢复</button>
+          <button data-go="routing">查看路由规则</button>
+        </div>
+
+        <div class="more-sec-title">平台状态</div>
+        <div class="more-stats" id="more-stats"><span class="spin"></span> 读取中…</div>
+
+        <div class="more-note">五层架构：接入 → 编排 → 执行 → 存储 → 可观测。每一步都写快照与结构化日志（强制 session_id / agent_id / step_index），写操作需人工确认。</div>
+      </div>
+    </div>
+
+    <!-- ---------- 弹窗 ---------- -->
+    <div class="modal-mask" id="probe-modal" style="display:none">
+      <div class="modal">
+        <div class="modal-head"><b id="probe-title">试运行结果</b>
+          <button class="modal-x" data-close="probe-modal">×</button></div>
+        <div id="probe-body"></div>
+      </div>
+    </div>
+
+    <div class="modal-mask" id="add-modal" style="display:none">
+      <div class="modal">
+        <div class="modal-head"><b>添加技能包（运行时可插拔）</b>
+          <button class="modal-x" data-close="add-modal">×</button></div>
+        <div class="form">
+          <label>技能名（小写字母 / 数字 / 下划线）
+            <input id="sk-name" placeholder="my_skill"></label>
+          <label>描述
+            <input id="sk-desc" placeholder="这个技能做什么"></label>
+          <label>分类
+            <select id="sk-cat"></select></label>
+          <label>实现体（复用已验证的本地能力）
+            <select id="sk-impl"></select></label>
+          <label>示例参数（JSON 对象）
+            <textarea id="sk-args" rows="3">{}</textarea></label>
+          <div class="hint" style="margin:0">写操作会经过人工确认；生成后自动重新扫描加载，无需重启。</div>
+          <div class="row">
+            <button class="primary" id="btn-create">创建并加载</button>
+            <span id="sk-msg" class="hint" style="margin:0"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------- 右侧悬浮按钮 ---------- -->
+    <div class="fabs">
+      <button class="fab" id="fab-kb" title="工具与技能">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8">
+          <rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M6 13h.01M10 13h.01M14 13h.01M18 13h.01M8 16h8"/>
+        </svg>
+      </button>
+      <button class="fab" id="fab-doc" title="诊断与恢复">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M7 3h7l4 4v14H7z"/><path d="M14 3v4h4M10 12h5M10 16h5"/>
+        </svg>
+      </button>
+    </div>
+
+    <button class="avatar" id="btn-avatar" title="运行状态">A</button>
+    <div class="popover avatar-pop" id="pop-avatar" style="display:none"></div>
+  </section>
+</main>
+<script src="/static/app.js"></script>
+<script>
+(function(){
+  var W=['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+  function pad(n){ return n<10 ? "0"+n : ""+n; }
+  function tick(){
+    var d=new Date();
+    var de=d.getFullYear()+'年'+(d.getMonth()+1)+'月'+d.getDate()+'日 '+W[d.getDay()];
+    var tm=pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+    var a=document.getElementById('hc-date'), b=document.getElementById('hc-time');
+    if(a) a.textContent=de; if(b) b.textContent=tm;
+  }
+  tick(); setInterval(tick,1000);
+})();
+</script>
+</body>
+</html>

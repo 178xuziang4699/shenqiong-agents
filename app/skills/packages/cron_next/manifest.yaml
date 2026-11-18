@@ -1,0 +1,27 @@
+name: cron_next
+version: 1.0.0
+description: 推算 */N 分钟cron的下几次触发时刻
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - cron
+  - 下次执行
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    expression:
+      type: string
+      description: 参数 expression
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 系统与工具
+color: '#475569'
+sample_args:
+  expression: '*/15 * * * *'
+origin: local

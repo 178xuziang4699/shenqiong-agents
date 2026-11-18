@@ -1,0 +1,27 @@
+name: color_convert
+version: 1.0.0
+description: HEX / RGB / HSV / 亮度换算
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 颜色
+  - HEX
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    hex:
+      type: string
+      description: 参数 hex
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 编码与安全
+color: '#0d9488'
+sample_args:
+  hex: '#2563eb'
+origin: local

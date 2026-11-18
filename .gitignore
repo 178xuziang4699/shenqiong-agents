@@ -1,0 +1,41 @@
+# ===== 运行时数据（含密钥、令牌、用户聊天记录，绝不提交）=====
+var/
+output/
+logs/
+.env
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+
+# ===== Python =====
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# ===== 构建 / 签名产物（含私钥，绝不提交）=====
+*.apk
+*.keystore
+*.jks
+*.p12
+*.pem
+*.key
+mobile/.build/
+build/
+dist/
+
+# ===== 编辑器 / 系统 =====
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo
+Thumbs.db

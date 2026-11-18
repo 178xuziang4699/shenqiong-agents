@@ -1,0 +1,29 @@
+name: geo_solar
+version: 1.0.0
+description: 按纬度与日期估算昼长（纯天文公式）
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 日出
+  - 昼长
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    latitude:
+      type: number
+    day_of_year:
+      type: integer
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 系统与工具
+color: '#475569'
+sample_args:
+  latitude: 39.9
+  day_of_year: 300
+origin: local

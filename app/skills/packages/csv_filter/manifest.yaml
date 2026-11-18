@@ -1,0 +1,38 @@
+name: csv_filter
+version: 1.0.0
+description: 按列值条件筛选 CSV 行
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 筛选
+  - CSV
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    path:
+      type: string
+      description: 参数 path
+    column:
+      type: string
+      description: 参数 column
+    op:
+      type: string
+      description: 参数 op
+    value:
+      type: integer
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 数据结构化
+color: '#7c3aed'
+sample_args:
+  path: samples/sample.csv
+  column: score
+  op: gte
+  value: 80
+origin: local

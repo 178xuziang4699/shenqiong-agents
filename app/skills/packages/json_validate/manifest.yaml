@@ -1,0 +1,32 @@
+name: json_validate
+version: 1.0.0
+description: 校验必填字段是否齐全
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 校验
+  - schema
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    json:
+      type: string
+      description: 参数 json
+    required:
+      type: array
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 数据结构化
+color: '#7c3aed'
+sample_args:
+  json: '{"name":"agent","ok":true}'
+  required:
+  - name
+  - ok
+origin: local

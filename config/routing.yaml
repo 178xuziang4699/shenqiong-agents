@@ -1,0 +1,63 @@
+# ============================================================
+# 双模式路由判定规则（改本文件即可调整路由，不需要改代码）
+# ------------------------------------------------------------
+# 机制：每条规则给某个模式投票，权重累加；得分高者胜出。
+#     若两模式分差 < min_margin，则保守落到 default_mode（避免误触发写操作）。
+# 支持 match.type：any_regex | all_regex | regex | contains | length_gt | length_lt
+# ============================================================
+
+default_mode: chat            # 兜底模式
+min_margin: 0.25              # 分差小于该值 → 用 default_mode
+max_input_chars: 4000         # 超长输入直接判为办事模式（大概率是任务描述）
+
+rules:
+  - name: chitchat_greeting
+    mode: chat
+    weight: 0.9
+    match:
+      type: any_regex
+      patterns:
+        - "^(你好|您好|hi|hello|嗨|在吗|早|晚上好)"
+        - "^(谢谢|多谢|收到|好的|ok|okay|明白)"
+        - "^(你是谁|你叫什么|你能做什么|介绍一下你自己)"
+
+  - name: chitchat_question
+    mode: chat
+    weight: 0.35
+    match:
+      type: regex
+      patterns:
+        - "(是什么|为什么|怎么理解|吗[？?]?$|[？?]$)"
+
+  - name: task_verb
+    mode: task
+    weight: 0.7
+    match:
+      type: any_regex
+      patterns:
+        - "(帮我|请|麻烦|需要你)"
+        - "(写|生成|整理|汇总|统计|分析|抽取|导出|抓取|清洗|归档|创建|更新|删除|发送|提交|下单)"
+
+  - name: task_object
+    mode: task
+    weight: 0.4
+    match:
+      type: any_regex
+      patterns:
+        - "(文件|目录|文件夹|表格|数据库|报告|笔记|素材|日志|订单|邮件|接口|知识库)"
+
+  - name: task_write_signal
+    mode: task
+    weight: 0.6
+    match:
+      type: any_regex
+      patterns:
+        - "(写入|保存到|存到|落库|发出去|发一份|提交到|删掉|清空)"
+
+  - name: chat_kb_lookup
+    mode: chat
+    weight: 0.3
+    match:
+      type: regex
+      patterns:
+        - "(有没有|有没有关于|查一下|搜一下).*(资料|文档|记录)"

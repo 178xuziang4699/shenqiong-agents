@@ -1,0 +1,34 @@
+name: unit_convert
+version: 1.0.0
+description: 长度单位换算
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 单位
+  - 换算
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    value:
+      type: integer
+    from:
+      type: string
+      description: 参数 from
+    to:
+      type: string
+      description: 参数 to
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 系统与工具
+color: '#475569'
+sample_args:
+  value: 1
+  from: km
+  to: m
+origin: local

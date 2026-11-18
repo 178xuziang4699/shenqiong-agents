@@ -1,0 +1,101 @@
+# Agent Platform + 管理后台 · 一键部署
+#
+#   ./deploy.sh up       构建并启动（含 healthcheck 与自动重启）
+#   ./deploy.sh status   查看状态
+#   ./deploy.sh logs     跟随日志
+#   ./deploy.sh down     停止
+#
+# 三个服务职责清晰、互相隔离：
+#   platform  智能体平台（面向用户，:8000）
+#   admin     管理后台（独立鉴权、独立页面，:8001）
+#   postgres  可选；启用 --profile pg 时提供上千并发所需的数据库
+# 平台与后台共享同一个数据卷 / 数据库（单一数据源），不做数据复制。
+
+services:
+  platform:
+    build: .
+    image: agent-platform:2.0
+    container_name: ap-platform
+    environment:
+      PORT: "8000"
+      WEB_WORKERS: "${WEB_WORKERS:-2}"
+      AP_CONFIRM_MODE: "approve"
+      AP_DB_DSN: "${AP_DB_DSN:-sqlite:////app/var/agent.db}"
+      AP_ADMIN_TOKEN: "${AP_ADMIN_TOKEN:-}"
+      AP_ADMIN_VIEW_TOKEN: "${AP_ADMIN_VIEW_TOKEN:-}"
+      AP_LLM_BASE_URL: "${AP_LLM_BASE_URL:-}"
+      AP_LLM_API_KEY: "${AP_LLM_API_KEY:-}"
+      AP_LLM_MODEL: "${AP_LLM_MODEL:-}"
+      AP_LLM_PROVIDER: "${AP_LLM_PROVIDER:-auto}"
+    volumes:
+      - ap-data:/app/var
+      - ap-output:/app/output
+      - ap-logs:/app/logs
+    ports:
+      - "8000:8000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/health',timeout=4)"]
+      interval: 30s
+      timeout: 5s
+      start_period: 20s
+      retries: 3
+    depends_on:
+      postgres:
+        condition: service_healthy
+        required: false
+
+  admin:
+    build: .
+    image: agent-platform:2.0
+    container_name: ap-admin
+    command: >
+      sh -c "exec python3 -m uvicorn admin.server:app --host 0.0.0.0
+      --port 8001 --workers 2"
+    environment:
+      ADMIN_PORT: "8001"
+      AP_DATA_DIR: "/app/var"
+      AP_DB_DSN: "${AP_DB_DSN:-sqlite:////app/var/agent.db}"
+      AP_ADMIN_TOKEN: "${AP_ADMIN_TOKEN:-}"
+      AP_ADMIN_VIEW_TOKEN: "${AP_ADMIN_VIEW_TOKEN:-}"
+      AP_PLATFORM_URL: "http://platform:8000"
+    volumes:
+      - ap-data:/app/var
+      - ap-logs:/app/logs
+    ports:
+      - "8001:8001"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8001/health',timeout=4)"]
+      interval: 30s
+      timeout: 5s
+      start_period: 15s
+      retries: 3
+    depends_on:
+      - platform
+
+  # 可选：上千并发写入场景启用。默认不启动，保持「简单、快速、好用」。
+  # 启用方式：AP_DB_DSN=postgresql://ap:ap@postgres:5432/agent ./deploy.sh pg
+  postgres:
+    image: postgres:16-alpine
+    container_name: ap-postgres
+    profiles: ["pg"]
+    environment:
+      POSTGRES_USER: "${PG_USER:-ap}"
+      POSTGRES_PASSWORD: "${PG_PASSWORD:-ap}"
+      POSTGRES_DB: "${PG_DB:-agent}"
+    volumes:
+      - ap-pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${PG_USER:-ap} -d ${PG_DB:-agent}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    # 数据库不对外暴露端口，仅容器网络内可达（数据库防护）
+
+volumes:
+  ap-data:
+  ap-output:
+  ap-logs:
+  ap-pgdata:

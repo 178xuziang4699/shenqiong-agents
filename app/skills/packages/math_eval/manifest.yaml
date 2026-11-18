@@ -1,0 +1,27 @@
+name: math_eval
+version: 1.0.0
+description: 安全四则运算求值（AST 白名单）
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 计算
+  - 表达式
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    expression:
+      type: string
+      description: 参数 expression
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 系统与工具
+color: '#475569'
+sample_args:
+  expression: (12 + 8) * 3 / 4
+origin: local

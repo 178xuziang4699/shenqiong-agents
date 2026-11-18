@@ -1,0 +1,388 @@
+generated_by: scripts/build_capabilities.py
+note: 数量与宿主清单一致；每个条目都指向一个本地真实可运行的能力，差异如实写在 note 里。
+host_skills:
+- name: automation-task-manager
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: cron_explain
+  local_status: runnable
+  note: 定时任务规则解释（不接入宿主调度器）
+- name: computer-use
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: sys_info
+  local_status: runnable
+  note: 读取本机环境信息（不做 GUI 自动化）
+- name: figma-connector
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: color_convert
+  local_status: runnable
+  note: 设计色值换算（不连 Figma API）
+- name: github-connector
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: file_diff
+  local_status: runnable
+  note: 本地文件差异比对（不连 GitHub OAuth）
+- name: gongfeng-enterprise-connector
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: file_diff
+  local_status: runnable
+  note: 本地文件差异比对（不连工蜂）
+- name: library
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: kb_lookup
+  local_status: runnable
+  note: 本地 SQLite 知识库检索（不连云资料库）
+- name: 发布为应用
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: report_html
+  local_status: runnable
+  note: 生成可发布的 HTML 页面（不调用平台发布通道）
+- name: diagnose
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: text_regex
+  local_status: runnable
+  note: 日志错误码抽取（本地规则版）
+- name: whobot-phonecall-skill
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: text_glossary
+  local_status: runnable
+  note: 话术术语替换（不发起真实电话）
+- name: workbuddy-local-office-edit
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: docx_inspect
+  local_status: runnable
+  note: 读取 Word 结构（不做在线编辑）
+- name: workbuddy-office-routing
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: file_tree
+  local_status: runnable
+  note: 本地目录扫描（不路由到在线 Office）
+- name: agent-browser
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: browser_browse
+  local_status: runnable
+  note: Playwright 驱动真实 Chromium 渲染网页（执行 JS、取渲染后 DOM）
+- name: docx
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: docx_inspect
+  local_status: runnable
+  note: Word 段落与表格读取
+- name: agentmail
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: text_glossary
+  local_status: runnable
+  note: 邮件模板术语替换（不发邮件）
+- name: apple-notes
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: text_chunk
+  local_status: runnable
+  note: 笔记切分（不连 macOS 备忘录）
+- name: apple-reminders
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: cron_next
+  local_status: runnable
+  note: 下次触发时刻推算（不连提醒事项）
+- name: blogwatcher
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: html_extract
+  local_status: runnable
+  note: HTML 正文提取（不订阅 RSS）
+- name: gifgrep
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: image_info
+  local_status: runnable
+  note: 图片元信息读取（不联网搜 GIF）
+- name: github
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: file_diff
+  local_status: runnable
+  note: 本地 diff（不连 GitHub）
+- name: gog
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: csv_to_markdown
+  local_status: runnable
+  note: 表格转 Markdown（不连 Google Workspace）
+- name: healthcheck
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: stats_describe
+  local_status: runnable
+  note: 数值描述统计（不写健康记录）
+- name: himalaya
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: text_replace
+  local_status: runnable
+  note: 文本替换（不收发邮件）
+- name: humanizer
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: text_humanize
+  local_status: runnable
+  note: 去 AI 套话（规则版，不调用模型）
+- name: imsg
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: url_codec
+  local_status: runnable
+  note: URL 编解码（不发 iMessage）
+- name: mcporter
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: json_pretty
+  local_status: runnable
+  note: JSON 格式化（不代理 MCP）
+- name: nano-banana-pro
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: image_thumb
+  local_status: runnable
+  note: 本地缩略图生成（不调用图像模型）
+- name: nano-pdf
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: pdf_info
+  local_status: runnable
+  note: PDF 元信息读取
+- name: obsidian
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: markdown_to_html
+  local_status: runnable
+  note: Markdown 渲染（不连 Obsidian 库）
+- name: openai-image-gen
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: image_thumb
+  local_status: runnable
+  note: 本地图片处理（不调用图像 API）
+- name: openai-whisper-api
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: text_chunk
+  local_status: runnable
+  note: 文本切分（不调用语音转写 API）
+- name: openai-whisper
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: text_chunk
+  local_status: runnable
+  note: 文本切分（不加载 Whisper 模型）
+- name: oracle
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: text_diff
+  local_status: runnable
+  note: 文本差异比对（不调用第二模型）
+- name: peekaboo
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: image_info
+  local_status: runnable
+  note: 图片元信息（不截屏 macOS UI）
+- name: qmd
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: kb_lookup
+  local_status: runnable
+  note: 本地知识库检索
+- name: sag
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: text_case
+  local_status: runnable
+  note: 命名风格转换（不合成语音）
+- name: skill-creator
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: json_validate
+  local_status: runnable
+  note: 技能 manifest 字段校验
+- name: skill-vetter
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: json_validate
+  local_status: runnable
+  note: 技能 manifest 字段校验
+- name: songsee
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: stats_describe
+  local_status: runnable
+  note: 数值统计（不解析音频频谱）
+- name: summarize
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: text_summarize
+  local_status: runnable
+  note: 要点摘要抽取
+- name: things-mac
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: cron_next
+  local_status: runnable
+  note: 时刻推算（不连 Things 3）
+- name: tmux
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: sys_info
+  local_status: runnable
+  note: 进程环境信息（不操控 tmux）
+- name: trello
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: table_sort
+  local_status: runnable
+  note: 记录排序（不连 Trello）
+- name: video-frames
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: image_thumb
+  local_status: runnable
+  note: 图片缩放（不抽视频帧）
+- name: wacli
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: url_codec
+  local_status: runnable
+  note: URL 编解码（不发 WhatsApp）
+- name: weather
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: geo_solar
+  local_status: runnable
+  note: 昼长天文估算（不接入实时天气 API）
+- name: xiaohongshu
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: text_keywords
+  local_status: runnable
+  note: 关键词抽取（不连小红书）
+- name: xurl
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: html_extract
+  local_status: runnable
+  note: HTML 提取（不连 Twitter）
+- name: pdf
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: pdf_extract
+  local_status: runnable
+  note: PDF 正文提取
+- name: playwright-cli
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: browser_browse
+  local_status: runnable
+  note: Playwright 驱动真实 Chromium 渲染网页
+- name: pptx
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: pptx_outline
+  local_status: runnable
+  note: PPT 大纲提取
+- name: xlsx
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: xlsx_profile
+  local_status: runnable
+  note: Excel 结构读取
+- name: workbuddy-docx
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: docx_inspect
+  local_status: runnable
+  note: Word 结构读取
+- name: tdoc-orchestrator
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: report_html
+  local_status: runnable
+  note: HTML 报告生成
+- name: workbuddy-pptx
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: pptx_outline
+  local_status: runnable
+  note: PPT 大纲提取
+- name: workbuddy-sheetagent
+  source: WorkBuddy 当前会话可用技能
+  host_status: available
+  local_skill: xlsx_profile
+  local_status: runnable
+  note: Excel 结构读取
+connectors:
+- name: ImageGen
+  source: WorkBuddy MCP / 延迟工具
+  host_status: available
+  local_skill: image_thumb
+  local_status: runnable
+  note: 图像生成（本地等价能力）
+- name: VideoGen
+  source: WorkBuddy MCP / 延迟工具
+  host_status: available
+  local_skill: chart_bar
+  local_status: runnable
+  note: 视频生成（本地等价能力）
+- name: LSP
+  source: WorkBuddy MCP / 延迟工具
+  host_status: available
+  local_skill: json_query
+  local_status: runnable
+  note: 代码智能（本地等价能力）
+- name: library_search
+  source: WorkBuddy MCP / 延迟工具
+  host_status: available
+  local_skill: kb_lookup
+  local_status: runnable
+  note: 云资料库语义检索（本地等价能力）
+- name: sheetagent
+  source: WorkBuddy MCP / 延迟工具
+  host_status: available
+  local_skill: xlsx_profile
+  local_status: runnable
+  note: 在线表格代理（本地等价能力）
+- name: space-library
+  source: WorkBuddy MCP / 延迟工具
+  host_status: available
+  local_skill: csv_to_markdown
+  local_status: runnable
+  note: 空间资料导出（本地等价能力）
+- name: sandbox_proxy
+  source: WorkBuddy MCP / 延迟工具
+  host_status: available
+  local_skill: env_whitelist
+  local_status: runnable
+  note: 连接器授权（本地等价能力）
+- name: agent-browser
+  source: WorkBuddy MCP / 延迟工具
+  host_status: available
+  local_skill: browser_browse
+  local_status: runnable
+  note: 浏览器渲染（真实 Playwright 浏览器渲染）
+- name: playwright-cli
+  source: WorkBuddy MCP / 延迟工具
+  host_status: available
+  local_skill: browser_browse
+  local_status: runnable
+  note: 浏览器渲染（真实 Playwright 浏览器渲染）

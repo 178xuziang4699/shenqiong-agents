@@ -1,0 +1,31 @@
+name: json_query
+version: 1.0.0
+description: 按点分路径读取 JSON 字段
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - JSON
+  - 查询
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    json:
+      type: string
+      description: 参数 json
+    path_expr:
+      type: string
+      description: 参数 path_expr
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 数据结构化
+color: '#7c3aed'
+sample_args:
+  json: '{"name":"agent","skills":[{"id":1},{"id":2}],"ok":true}'
+  path_expr: skills.0.id
+origin: local

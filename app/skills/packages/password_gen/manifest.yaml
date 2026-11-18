@@ -1,0 +1,29 @@
+name: password_gen
+version: 1.0.0
+description: 用安全随机数生成密码并估算熵
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 密码
+  - 随机
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    length:
+      type: integer
+    symbols:
+      type: boolean
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 编码与安全
+color: '#0d9488'
+sample_args:
+  length: 16
+  symbols: true
+origin: local

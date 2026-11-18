@@ -1,0 +1,36 @@
+name: text_dedupe
+version: 1.0.0
+description: 按行去重并保持原顺序
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 去重
+  - 清洗
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    text:
+      type: string
+      description: 参数 text
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 文本处理
+color: '#2563eb'
+sample_args:
+  text: '甲
+
+    乙
+
+    甲
+
+
+    丙
+
+    乙'
+origin: local

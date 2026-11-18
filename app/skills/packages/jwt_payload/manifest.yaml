@@ -1,0 +1,27 @@
+name: jwt_payload
+version: 1.0.0
+description: 解码 JWT payload（不验签，仅用于排查）
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - JWT
+  - 解码
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    token:
+      type: string
+      description: 参数 token
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 编码与安全
+color: '#0d9488'
+sample_args:
+  token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJkZW1vIiwiZXhwIjoxNzAwMDAwMDAwMH0.sig
+origin: local

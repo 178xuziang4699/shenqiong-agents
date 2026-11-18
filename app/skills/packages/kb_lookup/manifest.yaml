@@ -1,0 +1,31 @@
+name: kb_lookup
+version: 1.0.0
+description: 检索知识库并返回带来源引用的结果
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 知识库
+  - 检索
+  - 引用
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    query:
+      type: string
+      description: 参数 query
+    top_k:
+      type: integer
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 知识与检索
+color: '#db2777'
+sample_args:
+  query: 差旅报销审批节点
+  top_k: 3
+origin: local

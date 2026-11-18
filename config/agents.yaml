@@ -1,0 +1,34 @@
+# ============================================================
+# Agent 组织：1 个总控 + N 个管理者 + M 个执行者（两级派发，可扩展 N 级）
+# managers[].executors 定义该管理者的下属执行池；
+# executors[].skills / tools 定义能力边界，管理者按能力挑人。
+# ============================================================
+
+supervisor:
+  id: supervisor
+  name: 总控Agent
+  description: 接收原始指令，做意图解析与任务拆解，产出结构化任务计划并分派
+
+managers:
+  - id: mgr_content
+    name: 内容管理者
+    domains: [content, report, summarize, kb]
+    executors: [exec_text]
+  - id: mgr_data
+    name: 数据管理者
+    domains: [data, stat, tool]
+    executors: [exec_tool]
+
+executors:
+  - id: exec_text
+    name: 文本执行Agent
+    skills: [summarize_notes, compose_report, code_generate]
+    tools: [fs.read_text, fs.list_dir, fs.write_text]
+  - id: exec_tool
+    name: 工具执行Agent
+    skills: [code_check]
+    tools: [calc.word_count, calc.eval, kb.search, kb.ingest, fs.list_dir, fs.read_text]
+
+escalation:
+  # 管理者上报总控后的兜底链（总控可换人重试）
+  fallback_executors: [exec_tool, exec_text]

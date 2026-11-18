@@ -1,0 +1,39 @@
+name: table_sort
+version: 1.0.0
+description: 按指定键排序记录列表
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 排序
+  - 表格
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    rows:
+      type: array
+    key:
+      type: string
+      description: 参数 key
+    reverse:
+      type: boolean
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 数据结构化
+color: '#7c3aed'
+sample_args:
+  rows:
+  - name: b
+    v: 2
+  - name: a
+    v: 3
+  - name: c
+    v: 1
+  key: v
+  reverse: false
+origin: local

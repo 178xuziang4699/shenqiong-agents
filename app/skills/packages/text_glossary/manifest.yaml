@@ -1,0 +1,33 @@
+name: text_glossary
+version: 1.0.0
+description: 按术语表做确定性翻译替换
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 术语
+  - 翻译
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    text:
+      type: string
+      description: 参数 text
+    glossary:
+      type: object
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 文本处理
+color: '#2563eb'
+sample_args:
+  text: Agent calls MCP tools and loads a Skill package.
+  glossary:
+    Agent: 智能体
+    MCP: 工具协议
+    Skill: 技能包
+origin: local

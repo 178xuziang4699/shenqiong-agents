@@ -1,0 +1,23 @@
+name: sys_info
+version: 1.0.0
+description: 读取当前 Python 与主机环境信息
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 环境
+  - 系统
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties: {}
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 系统与工具
+color: '#475569'
+sample_args: {}
+origin: local

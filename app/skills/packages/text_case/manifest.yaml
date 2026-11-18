@@ -1,0 +1,31 @@
+name: text_case
+version: 1.0.0
+description: 命名风格转换 snake / camel / kebab / upper
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 命名
+  - 驼峰
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    text:
+      type: string
+      description: 参数 text
+    style:
+      type: string
+      description: 参数 style
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 文本处理
+color: '#2563eb'
+sample_args:
+  text: Agent Platform Capability
+  style: snake
+origin: local

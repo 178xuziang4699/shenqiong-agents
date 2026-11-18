@@ -1,0 +1,34 @@
+name: text_chunk
+version: 1.0.0
+description: 按长度与重叠度切分长文本
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 切分
+  - 分块
+  - chunk
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    text:
+      type: string
+      description: 参数 text
+    size:
+      type: integer
+    overlap:
+      type: integer
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 文本处理
+color: '#2563eb'
+sample_args:
+  text: 知识库文档入库前需要切分。切分后做向量化，再写入 SQLite。检索时按余弦相似度召回。
+  size: 24
+  overlap: 6
+origin: local

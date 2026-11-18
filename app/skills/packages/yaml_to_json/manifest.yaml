@@ -1,0 +1,27 @@
+name: yaml_to_json
+version: 1.0.0
+description: YAML 解析并转 JSON
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - YAML
+  - 转换
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    path:
+      type: string
+      description: 参数 path
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 数据结构化
+color: '#7c3aed'
+sample_args:
+  path: samples/sample.yaml
+origin: local

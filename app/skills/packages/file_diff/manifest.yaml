@@ -1,0 +1,31 @@
+name: file_diff
+version: 1.0.0
+description: 比对两个文本文件的差异
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 文件
+  - diff
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    left:
+      type: string
+      description: 参数 left
+    right:
+      type: string
+      description: 参数 right
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 系统与工具
+color: '#475569'
+sample_args:
+  left: samples/notes.md
+  right: samples/kb_policy.md
+origin: local

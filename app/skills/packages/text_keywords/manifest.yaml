@@ -1,0 +1,30 @@
+name: text_keywords
+version: 1.0.0
+description: 基于词频抽取关键词
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 关键词
+  - 词频
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    text:
+      type: string
+      description: 参数 text
+    top_k:
+      type: integer
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 文本处理
+color: '#2563eb'
+sample_args:
+  text: 报销审批 审批链路 报销制度 报销单 财务总监 审批节点
+  top_k: 5
+origin: local

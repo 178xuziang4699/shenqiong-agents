@@ -1,0 +1,29 @@
+name: doc_write
+version: 1.0.0
+description: 按需求生成完整中文办公文档（周报 / 方案 / 报告 / 邮件 / 通知 / 纪要 / 大纲等），产出可直接使用的 Markdown 正文
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords: [写文档, 写周报, 写方案, 起草, 生成文档]
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    spec:
+      type: string
+      description: 文档需求，例如「帮我写一份本周的工作周报」
+    doc_type:
+      type: string
+      description: 文种 key（可留空自动识别）
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 60
+category: 办公文档
+color: '#2563eb'
+sample_args:
+  spec: 帮我写一份本周的工作周报
+  doc_type: weekly
+origin: local

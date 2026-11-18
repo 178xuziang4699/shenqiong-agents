@@ -1,0 +1,25 @@
+name: data_profile
+version: 1.0.0
+description: 对一组数值做描述性统计（均值 / 中位数 / 标准差 / 极值 / 四分位 / 合计），用于办公数据分析
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords: [数据统计, 描述统计, 均值, 分析数据]
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    label:
+      type: string
+      description: 数据说明
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 数据办公
+color: '#0891b2'
+sample_args:
+  label: 本周每日处理量
+origin: local

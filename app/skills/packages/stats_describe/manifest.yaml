@@ -1,0 +1,34 @@
+name: stats_describe
+version: 1.0.0
+description: 描述性统计：均值/中位数/标准差
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 统计
+  - 描述
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    values:
+      type: array
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 数据结构化
+color: '#7c3aed'
+sample_args:
+  values:
+  - 2
+  - 4
+  - 4
+  - 4
+  - 5
+  - 5
+  - 7
+  - 9
+origin: local

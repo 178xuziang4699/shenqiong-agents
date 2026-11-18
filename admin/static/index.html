@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent Platform · 管理后台</title>
+<style>
+:root{
+  --bg:#f5f7fa; --card:#fff; --line:#e6e9ef; --text:#1f2329; --sub:#6b7280;
+  --brand:#2f6bff; --brand-soft:#eef3ff; --ok:#16a34a; --warn:#d97706;
+  --err:#dc2626; --side:#fff;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);
+  font:14px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+button,input,select,textarea{font:inherit}
+#login{position:fixed;inset:0;background:linear-gradient(135deg,#eef3ff,#f7f9fc);
+  display:flex;align-items:center;justify-content:center;z-index:100}
+#login .box{background:#fff;border:1px solid var(--line);border-radius:16px;
+  padding:32px;width:min(420px,90vw);box-shadow:0 12px 40px rgba(31,35,41,.08)}
+#login h1{font-size:20px;margin:0 0 6px}
+#login p{color:var(--sub);font-size:13px;margin:0 0 20px}
+#login input{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 13px;margin-bottom:12px}
+#login button{width:100%;background:var(--brand);color:#fff;border:0;border-radius:10px;padding:11px;cursor:pointer}
+#login .tip{font-size:12px;color:var(--sub);margin-top:14px;line-height:1.7}
+#app{display:none;height:100vh;grid-template-columns:244px 1fr;grid-template-rows:56px 1fr}
+#app.on{display:grid}
+header{grid-column:1/3;background:#fff;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:14px;padding:0 20px;z-index:5}
+header .logo{font-weight:700;font-size:16px}
+header .badge{font-size:11px;background:var(--brand-soft);color:var(--brand);
+  padding:2px 9px;border-radius:999px}
+header .sp{flex:1}
+header .role{font-size:12px;color:var(--sub)}
+header a{color:var(--brand);text-decoration:none;font-size:13px}
+.live{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--sub)}
+.live i{width:7px;height:7px;border-radius:50%;background:#cbd5e1;display:inline-block}
+.live.on i{background:var(--ok);box-shadow:0 0 0 3px rgba(22,163,74,.15)}
+aside{background:var(--side);border-right:1px solid var(--line);overflow:auto;padding:10px 0}
+.grp{margin-bottom:2px}
+.grp>.t{display:flex;align-items:center;gap:9px;padding:9px 16px;cursor:pointer;
+  font-weight:600;font-size:13px;user-select:none}
+.grp>.t:hover{background:#f7f9fc}
+.grp>.t .ic{width:20px;text-align:center;color:var(--brand)}
+.grp>.t .ar{margin-left:auto;color:#9ca3af;font-size:11px;transition:transform .15s}
+.grp.open>.t .ar{transform:rotate(90deg)}
+.grp .sub{display:none;padding:2px 0 6px}
+.grp.open .sub{display:block}
+.grp .sub button{display:block;width:100%;text-align:left;border:0;background:none;
+  padding:7px 16px 7px 45px;color:var(--sub);font-size:12.5px;cursor:pointer}
+.grp .sub button:hover{color:var(--brand);background:#f7f9fc}
+.grp .sub button.on{color:var(--brand);background:var(--brand-soft);font-weight:600}
+main{overflow:auto;padding:20px 24px 60px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:16px}
+.card h2{font-size:15px;margin:0 0 4px}
+.card .hint{color:var(--sub);font-size:12px;margin:0 0 14px}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.kpi{background:#fafbfd;border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.kpi b{display:block;font-size:22px;line-height:1.3}
+.kpi span{color:var(--sub);font-size:12px}
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--sub);font-weight:600;background:#fafbfc;white-space:nowrap}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:11.5px}
+.tag{display:inline-block;padding:1px 8px;border-radius:999px;font-size:11px;background:#eef2ff;color:#3730a3}
+.tag.ok{background:#dcfce7;color:#15803d}
+.tag.err{background:#fee2e2;color:#b91c1c}
+.tag.warn{background:#fef3c7;color:#92400e}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:7px 10px;background:#fff;color:var(--text)}
+button.btn{background:#fff;border:1px solid var(--line);border-radius:8px;padding:7px 13px;cursor:pointer}
+button.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+button.btn:hover{filter:brightness(.97)}
+pre{white-space:pre-wrap;word-break:break-all;background:#f8f9fb;border:1px solid var(--line);
+  border-radius:8px;padding:12px;max-height:380px;overflow:auto;font-size:12px}
+.empty{color:var(--sub);text-align:center;padding:26px 0}
+.note{background:#f8faff;border:1px solid #dbe6ff;border-radius:9px;padding:11px 13px;
+  font-size:12.5px;color:#334155;margin-bottom:14px}
+.note.err{background:#fff5f5;border-color:#fecaca;color:#991b1b}
+.kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:10px}
+.kv div{background:#fafbfd;border:1px solid var(--line);border-radius:8px;padding:9px 12px;font-size:12.5px}
+.kv b{color:var(--sub);font-weight:600}
+#feed{font-family:ui-monospace,monospace;font-size:11.5px;max-height:420px;overflow:auto}
+#feed .row{padding:5px 8px;border-bottom:1px solid #f0f2f6;display:flex;gap:9px}
+#feed .row .t{color:#9ca3af;white-space:nowrap}
+#feed .row .k{color:var(--brand);min-width:96px}
+#feed .row .s{flex:1;word-break:break-all}
+@media(max-width:820px){#app{grid-template-columns:1fr}aside{display:none}main{padding:14px}}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="box">
+    <h1>Agent Platform</h1>
+    <p>智能体 Agent · 独立管理后台（第二阶段）</p>
+    <input id="tok" type="password" placeholder="请输入访问令牌" autocomplete="off">
+    <button onclick="doLogin()">进入管理后台</button>
+    <div class="tip">
+      超管令牌：<span class="mono" id="hint-admin">AP_ADMIN_TOKEN</span><br>
+      只读令牌：<span class="mono" id="hint-view">AP_ADMIN_VIEW_TOKEN</span><br>
+      令牌由部署脚本生成并保存在 <span class="mono">var/admin_token.txt</span>（权限 600）。
+    </div>
+    <div class="tip err" id="login-err" style="display:none"></div>
+  </div>
+</div>
+
+<div id="app">
+  <header>
+    <span class="logo">🤖 Agent Platform</span>
+    <span class="badge">Agent Platform 管理后台</span>
+    <span class="sp"></span>
+    <span class="live" id="live"><i></i><span>实时连接中…</span></span>
+    <span class="role" id="role"></span>
+    <a href="/" target="_blank">平台首页 ↗</a>
+  </header>
+  <aside id="nav"></aside>
+  <main><div id="view"><div class="empty">正在加载总览…</div></div></main>
+</div>
+
+<script>
+// ---- 路径前缀：兼容「独立进程 /」与「挂载 /console/」两种形态 ----
+const P = location.pathname.replace(/\/+$/,'');
+const API = (p) => `${P}/api/admin/${p}`;
+let TOKEN = '';   // 每次打开页面都必须手动输入令牌，不做本地持久化恢复
+let ROLE = '';
+
+async function api(p, opt={}) {
+  const r = await fetch(API(p), { ...opt, headers: {
+    'X-Admin-Token': TOKEN, 'Content-Type':'application/json', ...(opt.headers||{}) }});
+  if (r.status === 401) { logout('令牌失效，请重新登录'); throw new Error('401'); }
+  const d = await r.json().catch(()=>({}));
+  if (!r.ok) { const e = new Error(d.message || d.error || ('HTTP '+r.status));
+               e.payload = d; throw e; }
+  return d;
+}
+function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g,c=>
+  ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+function tbl(cols, rows){ return `<table><thead><tr>${cols.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead>
+  <tbody>${rows.length?rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join('')}</tr>`).join(''):
+  `<tr><td colspan="${cols.length}" class="empty">暂无数据</td></tr>`}</tbody></table>`; }
+function tag(s){ const ok=['ok','done','completed','resolved','pass'].includes(String(s).toLowerCase());
+  const bad=['failed','error','interrupted','open','denied','rejected'].includes(String(s).toLowerCase());
+  return `<span class="tag ${ok?'ok':bad?'err':'warn'}">${esc(s)}</span>`; }
+function fmtTime(t){ return String(t||'').replace('T',' ').slice(0,19); }
+
+async function doLogin(){
+  const t = document.getElementById('tok').value.trim();
+  if(!t) return;
+  try{
+    const d = await fetch(API('login'), {method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({token:t})}).then(r=>r.json());
+    if(!d.ok){ throw new Error(d.message||'令牌无效'); }
+    TOKEN = t; ROLE = d.role;
+    enter();
+  }catch(e){ const el=document.getElementById('login-err'); el.style.display='block'; el.textContent=e.message; }
+}
+function logout(msg){
+  TOKEN = ''; ROLE = '';
+  document.getElementById('app').classList.remove('on');
+  document.getElementById('login').style.display='flex';
+  if(msg){ const el=document.getElementById('login-err'); el.style.display='block'; el.textContent=msg; }
+}
+function enter(){
+  document.getElementById('login').style.display='none';
+  document.getElementById('app').classList.add('on');
+  document.getElementById('role').textContent = ROLE==='admin'?'● 超管':'● 只读';
+  buildNav(); openMenu('overview','ov-health'); startStream();
+}
+
+// ---- 主菜单 → 子菜单（与结构框架文档严格对应） ----
+let MENU = [
+  {id:'overview', icon:'📊', t:'0. 总览驾驶舱', sub:[
+    ['ov-health','0.1 平台健康总览'],['ov-metrics','0.2 实时指标'],
+    ['ov-sync','0.3 数据同步状态'],['ov-topo','0.4 服务拓扑']]},
+  {id:'tasks', icon:'📋', t:'1. 任务与作业', sub:[
+    ['tk-list','1.1 会话列表'],['tk-chain','1.2 任务执行链'],
+    ['tk-flow','1.3 作业流转图'],['tk-replay','1.4 快照与上下文回放']]},
+  {id:'diag', icon:'🩺', t:'2. 诊断与恢复', sub:[
+    ['dg-one','2.1 一键诊断'],['dg-resume','2.2 断点恢复'],['dg-inject','2.3 故障注入']]},
+  {id:'errors', icon:'🚨', t:'3. 错误代码核查', sub:[
+    ['er-lookup','3.1 错误代码查询'],['er-list','3.2 事故列表'],
+    ['er-evidence','3.3 关联证据串联'],['er-resolve','3.4 处置与标注']]},
+  {id:'events', icon:'⚡', t:'4. 实时事件流', sub:[
+    ['ev-stream','4.1 事件订阅'],['ev-search','4.2 事件检索'],['ev-check','4.3 一致性对账']]},
+  {id:'agents', icon:'🤖', t:'5. 智能体与编排', sub:[
+    ['ag-list','5.1 Agent 注册与角色'],['ag-route','5.2 分派与路由配置'],['ag-policy','5.3 工作流与策略']]},
+  {id:'catalog', icon:'🧰', t:'6. 工具与技能', sub:[
+    ['ct-tools','6.1 工具注册表'],['ct-skills','6.2 技能目录'],['ct-mcp','6.3 MCP 连接器']]},
+  {id:'kb', icon:'📚', t:'7. 资料库与知识', sub:[
+    ['kb-docs','7.1 文档索引'],['kb-hit','7.2 检索命中']]},
+  {id:'security', icon:'🔐', t:'8. 安全与访问', sub:[
+    ['sc-check','8.1 安全基线核查'],['sc-audit','8.2 审计日志'],['sc-secret','8.3 密钥与配置'],['sc-db','8.4 数据库防护']]},
+  {id:'sandbox', icon:'🧱', t:'9. 沙箱隔离', sub:[
+    ['sb-view','9.1 隔离视图'],['sb-rules','9.2 隔离规则']]},
+  {id:'system', icon:'⚙️', t:'10. 系统与部署', sub:[
+    ['sy-status','10.1 容器状态'],['sy-deploy','10.2 一键部署'],
+    ['sy-backup','10.3 备份与恢复'],['sy-cap','10.4 压测与容量报告']]},
+];
+function buildNav(){
+  document.getElementById('nav').innerHTML = MENU.map((g,i)=>`
+    <div class="grp ${i===0?'open':''}" data-g="${g.id}">
+      <div class="t" onclick="this.parentNode.classList.toggle('open')">
+        <span class="ic">${g.icon}</span><span>${g.t}</span><span class="ar">▶</span></div>
+      <div class="sub">${g.sub.map(([id,t])=>`<button data-id="${id}" onclick="openMenu('${g.id}','${id}')">${t}</button>`).join('')}</div>
+    </div>`).join('');
+}
+function openMenu(gid, id){
+  document.querySelectorAll('.grp .sub button').forEach(b=>b.classList.toggle('on', b.dataset.id===id));
+  const g = MENU.find(x=>x.id===gid); if(g){ const el=document.querySelector(`[data-g="${gid}"]`); if(el) el.classList.add('open'); }
+  render(id);
+}
+
+// ---- 各页面渲染 ----
+async function render(id){
+  const v = document.getElementById('view');
+  v.innerHTML = '<div class="empty">加载中…</div>';
+  try{
+    if(id.startsWith('ov-')) return await renderOverview(id,v);
+    if(id==='tk-list') return await renderSessions(v);
+    if(id==='tk-chain'||id==='tk-flow'||id==='tk-replay') return await renderChain(v,id);
+    if(id==='dg-one'||id==='dg-resume'||id==='dg-inject') return await renderDiag(v,id);
+    if(id.startsWith('er-')) return await renderErrors(v,id);
+    if(id.startsWith('ev-')) return await renderEvents(v,id);
+    if(id.startsWith('ag-')) return await renderAgents(v,id);
+    if(id.startsWith('ct-')) return await renderCatalog(v,id);
+    if(id.startsWith('kb-')) return await renderKb(v,id);
+    if(id.startsWith('sc-')) return await renderSecurity(v,id);
+    if(id.startsWith('sb-')) return await renderSandbox(v,id);
+    if(id.startsWith('sy-')) return await renderSystem(v,id);
+  }catch(e){ v.innerHTML = `<div class="note err">加载失败：${esc(e.message)}</div>`; }
+}
+
+function head(t,h){ return `<div class="card"><h2>${esc(t)}</h2><p class="hint">${esc(h)}</p>`; }
+
+async function renderOverview(id,v){
+  const d = await api('overview');
+  if(id==='ov-health'){
+    v.innerHTML = head('0.1 平台健康总览','平台与后台共享同一数据源，以下计数来自实时查询')+
+      `<div class="kpis">
+        <div class="kpi"><b>${d.sessions}</b><span>会话总数</span></div>
+        <div class="kpi"><b>${d.tasks}</b><span>子任务</span></div>
+        <div class="kpi"><b>${d.snapshots}</b><span>上下文快照</span></div>
+        <div class="kpi"><b>${d.logs}</b><span>结构化日志</span></div>
+        <div class="kpi"><b>${d.chat_turns}</b><span>对话轮次</span></div>
+        <div class="kpi"><b>${d.events}</b><span>实时事件</span></div>
+        <div class="kpi"><b>${d.incidents_open}</b><span>待处置事故</span></div>
+        <div class="kpi"><b>${d.capabilities.tools}/${d.capabilities.skills}</b><span>工具 / 技能</span></div>
+      </div></div>`+
+      `<div class="card"><h2>会话状态分布</h2>${tbl(['状态','数量'],(d.by_status||[]).map(r=>[tag(r.status),esc(r.n)]))}</div>`;
+  } else if(id==='ov-metrics'){
+    const p=d.performance;
+    v.innerHTML = head('0.2 实时指标','耗时取自 chat.done 事件的真实测量值，非估算')+
+      `<div class="kpis">
+        <div class="kpi"><b>${p.avg_duration_ms}<small> ms</small></b><span>平均任务耗时</span></div>
+        <div class="kpi"><b>${p.p95_duration_ms==null?'-':p.p95_duration_ms}<small> ms</small></b><span>P95 耗时</span></div>
+        <div class="kpi"><b>${p.samples}</b><span>采样轮次</span></div>
+        <div class="kpi"><b>${d.tasks?Math.round(100*d.tasks_done/d.tasks):0}%</b><span>子任务完成率</span></div>
+        <div class="kpi"><b>${d.incidents}</b><span>累计事故</span></div>
+        <div class="kpi"><b>${d.service.uptime_seconds}s</b><span>后台运行时长</span></div>
+      </div></div>`+
+      `<div class="note">当前为单机 SQLite + WAL 部署。支撑「上百人」已具备基础（多进程读、写入串行化）；
+      「上千人同时高强度写入」需切换 PostgreSQL 并水平扩容，压测结论见 10.4，不做超出实测的承诺。</div>`;
+  } else if(id==='ov-sync'){
+    const c=d.consistency;
+    v.innerHTML = head('0.3 数据同步状态','直接回答「前端跑完任务、后台看不看得见」')+
+      `<div class="note"><b>${esc(c.conclusion)}</b></div>`+
+      `<div class="kv">
+        <div><b>单一数据源</b>：${c.single_source_of_truth?'是':'否'}</div>
+        <div><b>共享数据库</b>：${c.shared_database?'是':'否'}</div>
+        <div><b>前端用户轮次</b>：${c.frontend_turns_vs_backend_records.frontend_user_turns}</div>
+        <div><b>后台已存轮次</b>：${c.frontend_turns_vs_backend_records.backend_stored_turns}</div>
+        <div><b>每轮均有后台记录</b>：${c.frontend_turns_vs_backend_records.each_frontend_turn_has_backend_record?'✅ 是':'❌ 否'}</div>
+        <div><b>事件总数</b>：${c.events.total}</div>
+        <div><b>会话 / 任务 / 快照</b>：${c.sessions} / ${c.tasks} / ${c.snapshots}</div>
+        <div><b>核验时间</b>：${esc(fmtTime(c.verified_at))}</div>
+      </div></div>`;
+  } else {
+    v.innerHTML = head('0.4 服务拓扑','三个服务独立，数据库仅挂内部卷')+
+      tbl(['服务','角色','地址'],(d.topology||[]).map(t=>[esc(t.service),esc(t.role),`<span class="mono">${esc(t.url)}</span>`]));
+  }
+}
+
+async function renderSessions(v){
+  const d = await api('sessions?limit=200');
+  window._sessions=d.sessions;
+  v.innerHTML = head('1.1 会话列表','点击「详情」查看该会话的完整执行链')+
+    `<div class="bar">
+      <select id="f-ch" onchange="filterSessions()"><option value="">全部通道</option><option value="chat">对话 chat</option><option value="work">办公 work</option></select>
+      <select id="f-owner" onchange="filterSessions()"><option value="">全部归属</option>
+        ${[...new Set(d.sessions.map(s=>s.owner))].map(o=>`<option value="${esc(o)}">${esc(o)}</option>`).join('')}</select>
+      <button class="btn" onclick="render('tk-list')">刷新</button>
+    </div><div id="sess-tbl"></div></div>`;
+  filterSessions();
+}
+function filterSessions(){
+  const ch=document.getElementById('f-ch').value, ow=document.getElementById('f-owner').value;
+  const rows=window._sessions.filter(s=>(!ch||s.channel===ch)&&(!ow||s.owner===ow));
+  document.getElementById('sess-tbl').innerHTML = tbl(
+    ['会话 ID','通道','归属','状态','步数','最近活动','操作'],
+    rows.map(s=>[`<span class="mono">${esc(String(s.session_id).slice(0,18))}</span>`,tag(s.channel),
+      esc(s.owner),tag(s.status),esc(s.step_index??'-'),esc(fmtTime(s.updated_at)),
+      `<button class="btn" onclick="pickSession('${esc(s.session_id)}')">详情</button>`]));
+}
+function pickSession(sid){ window._sid=sid; openMenu('tasks','tk-chain'); }
+
+async function renderChain(v,id){
+  const sid = window._sid || ((await api('sessions?limit=1')).sessions[0]||{}).session_id;
+  const bar = `<div class="bar"><label>会话</label><select id="sel-sid" onchange="window._sid=this.value;render('${id}')" style="min-width:300px">
+    ${window._sessions?window._sessions.map(s=>`<option value="${esc(s.session_id)}" ${s.session_id===sid?'selected':''}>${esc(String(s.session_id).slice(0,24))} · ${esc(s.channel)} · ${esc(s.status)}</option>`).join(''):''}
+    </select><button class="btn" onclick="render('${id}')">刷新</button></div>`;
+  if(!sid){ v.innerHTML=head('任务执行链','')+'<div class="empty">暂无会话，请先在智能体平台执行一个任务</div></div>'; return; }
+  window._sid=sid;
+  const d = await api('sessions/'+encodeURIComponent(sid));
+  if(!d.found){ v.innerHTML='<div class="empty">会话不存在</div>'; return; }
+  if(id==='tk-chain'){
+    v.innerHTML = head('1.2 任务执行链','两级分派：子任务 → 作业，含 assignee 与状态')+bar+`</div>`+
+      `<div class="card"><h2>子任务</h2>${tbl(['任务','标题','执行者','状态','重试'],d.tasks.map(t=>[
+        `<span class="mono">${esc(t.task_id)}</span>`,esc(t.title),esc(t.assignee),tag(t.status),esc(t.attempts)]))}</div>`+
+      `<div class="card"><h2>作业</h2>${tbl(['作业','Agent','动作','目标','状态'],d.jobs.map(j=>[
+        `<span class="mono">${esc(String(j.job_id).slice(0,20))}</span>`,esc(j.agent_id),esc(j.action),esc(j.target),tag(j.status)]))}</div>`;
+  } else if(id==='tk-flow'){
+    v.innerHTML = head('1.3 作业流转图','from → to Agent 及裁决')+bar+`</div>`+
+      `<div class="card">${tbl(['步号','来源','去向','裁决','原因'],d.handoffs.map(h=>[
+        esc(h.step_index),esc(h.from_agent),esc(h.to_agent),tag(h.verdict||'-'),esc(h.reason)]))}</div>`;
+  } else {
+    v.innerHTML = head('1.4 快照与上下文回放','每一步快照 + 统一多轮上下文')+bar+`</div>`+
+      `<div class="card"><h2>步骤快照</h2>${tbl(['步号','Agent','阶段','状态','时间'],d.snapshots.map(s=>[
+        esc(s.step_index),esc(s.agent_id),esc(s.phase),tag(s.status),esc(fmtTime(s.created_at))]))}</div>`+
+      `<div class="card"><h2>统一对话历史</h2>${tbl(['轮次','角色','动作','内容'],d.chat_turns.map(t=>[
+        esc(t.turn_index),tag(t.role),esc(t.mode||'-'),
+        `<span class="mono">${esc(String(t.content).slice(0,120))}</span>`]))}</div>`;
+  }
+}
+
+async function renderDiag(v,id){
+  const sid = window._sid || ((await api('sessions?limit=1')).sessions[0]||{}).session_id;
+  const bar=`<div class="bar"><label>会话</label><input id="dg-sid" value="${esc(sid||'')}" style="min-width:320px" placeholder="输入 session_id">
+    <button class="btn" onclick="doDiag()">诊断</button></div>`;
+  if(id==='dg-one'){
+    v.innerHTML=head('2.1 一键诊断','沿用平台现有排查系统：最后成功步骤 / 首个失败点 / 错误归类 / 建议动作')+
+      bar+'<div id="dg-out"></div></div>';
+    if(sid) doDiag();
+  } else if(id==='dg-resume'){
+    v.innerHTML=head('2.2 断点恢复','从断点恢复未完成会话（需超管令牌；写操作转发平台执行）')+bar+
+      `<div class="bar"><button class="btn primary" onclick="doResume()">触发恢复</button></div><div id="dg-out"></div></div>`;
+  } else {
+    v.innerHTML=head('2.3 故障注入','用于验证恢复链路；平台 CLI 提供对应命令')+
+      `<div class="note">故障注入属于平台侧能力（TOOL_ERROR / INTERRUPTED），本后台通过
+      「一键诊断 → 断点恢复」验证其产生的断点与恢复结果，不在后台重复实现注入器。</div>`+
+      `<div class="card">${tbl(['故障类型','内部错误码','验证方式'],[
+        ['工具瞬时故障','<span class="mono">TOOL_ERROR</span>','重试后恢复，快照留痕'],
+        ['进程中断','<span class="mono">INTERRUPTED</span>','resume 从断点续跑'],
+        ['结果验收失败','<span class="mono">VALIDATION_FAILED</span>','管理者打回重派'],
+      ].map(r=>r.map(c=>c)))}</div>`;
+  }
+}
+async function doDiag(){
+  const sid=document.getElementById('dg-sid').value.trim(); if(!sid) return;
+  window._sid=sid;
+  try{ const d=await api('sessions/'+encodeURIComponent(sid)+'/diagnose');
+    document.getElementById('dg-out').innerHTML = `<div class="card"><h2>诊断结果</h2>
+      <div class="kv">
+        <div><b>会话状态</b>：${tag(d.session_status)}</div>
+        <div><b>错误归类</b>：${esc(d.error_class)} · ${esc(d.error_class_desc||'')}</div>
+        <div><b>首个失败点</b>：${d.first_failure?`step ${d.first_failure.step_index} · ${esc(d.first_failure.agent_id)}`:'无'}</div>
+        <div><b>最后成功</b>：${d.last_success?`step ${d.last_success.step_index}`:'无'}</div>
+        <div><b>建议动作</b>：${esc(d.suggested_action||'-')}</div>
+        <div><b>可恢复</b>：${d.resumable?'是':'否'}</div>
+      </div><pre style="margin-top:12px">${esc(d.report||'')}</pre></div>`;
+  }catch(e){ document.getElementById('dg-out').innerHTML=`<div class="note err">${esc(e.message)}</div>`; }
+}
+async function doResume(){
+  const sid=document.getElementById('dg-sid').value.trim(); if(!sid) return;
+  try{ const d=await api('sessions/'+encodeURIComponent(sid)+'/resume',{method:'POST'});
+    document.getElementById('dg-out').innerHTML=`<div class="note ${d.ok?'':'err'}">${esc(JSON.stringify(d,null,2))}</div>`;
+  }catch(e){ document.getElementById('dg-out').innerHTML=`<div class="note err">${esc(e.message)}</div>`; }
+}
+
+async function renderErrors(v,id){
+  if(id==='er-lookup'){
+    v.innerHTML=head('3.1 错误代码查询','输入用户反馈的错误代码（AP-YYYYMMDD-XXXXXX），一次带出全链路证据')+
+      `<div class="bar"><input id="er-code" placeholder="例如 AP-20261115-K7M2QX" style="min-width:300px">
+      <button class="btn primary" onclick="doLookup()">核查</button></div><div id="er-out"></div></div>`;
+  } else if(id==='er-list'){
+    const d=await api('incidents?limit=200');
+    window._incidents=d.incidents;
+    v.innerHTML=head('3.2 事故列表','所有已生成的可反馈错误代码')+
+      `<div class="card">${tbl(['错误代码','内部归类','来源','消息','状态','时间','操作'],d.incidents.map(i=>[
+        `<span class="mono">${esc(i.code)}</span>`,tag(i.error_class),esc(i.source||'-'),
+        esc(String(i.message||'').slice(0,60)),tag(i.status),esc(fmtTime(i.created_at)),
+        `<button class="btn" onclick="fillLookup('${esc(i.code)}')">核查</button>`]))}</div>`;
+  } else if(id==='er-evidence'){
+    v.innerHTML=head('3.3 关联证据串联','核查结果自动串联会话 / 步骤 / 快照 / 日志 / 工具审计 / 事件')+
+      `<div class="note">在「3.1 错误代码查询」输入代码后，此处会展示完整证据链。</div>`+
+      `<div id="er-out"></div></div>`;
+  } else {
+    v.innerHTML=head('3.4 处置与标注','记录排查结论、标记已解决（需超管令牌）')+
+      `<div class="bar"><input id="rs-code" placeholder="错误代码" style="min-width:260px">
+      <input id="rs-note" placeholder="排查结论 / 处理说明" style="min-width:300px">
+      <button class="btn primary" onclick="doResolve()">标记已解决</button></div><div id="rs-out"></div></div>`;
+  }
+}
+function fillLookup(code){ openMenu('errors','er-lookup'); setTimeout(()=>{
+  const el=document.getElementById('er-code'); if(el){el.value=code; doLookup();} },50); }
+async function doLookup(){
+  const code=document.getElementById('er-code').value.trim(); if(!code) return;
+  const out=document.getElementById('er-out');
+  try{ const d=await api('incidents/lookup?code='+encodeURIComponent(code));
+    window._lookup=d;
+    if(!d.found){ out.innerHTML=`<div class="note err">未查到错误代码 <b>${esc(code)}</b>，请核对后重试。</div>`; return; }
+    const i=d.incident;
+    out.innerHTML=`<div class="card"><h2>事故本体 · <span class="mono">${esc(i.code)}</span></h2>
+      <div class="kv">
+        <div><b>内部归类</b>：${tag(i.error_class)}</div><div><b>等级</b>：${esc(i.level)}</div>
+        <div><b>来源</b>：${esc(i.source||'-')}</div><div><b>状态</b>：${tag(i.status)}</div>
+        <div><b>会话</b>：<span class="mono">${esc(i.session_id||'-')}</span></div>
+        <div><b>步号</b>：${esc(i.step_index??'-')}</div>
+        <div><b>时间</b>：${esc(fmtTime(i.created_at))}</div>
+        <div><b>处置结论</b>：${esc(i.resolution||'未处置')}</div>
+      </div><pre style="margin-top:12px">${esc(i.message||'')}${i.stack?'\n\n--- stack ---\n'+esc(i.stack):''}</pre></div>`+
+      (d.session?`<div class="card"><h2>关联会话</h2><div class="kv">
+        <div><b>状态</b>：${tag(d.session.status)}</div><div><b>通道</b>：${esc(d.session.channel)}</div>
+        <div><b>归属</b>：${esc(d.session.owner||'default')}</div><div><b>步号</b>：${esc(d.session.step_index)}</div></div></div>`:'')+
+      `<div class="card"><h2>步骤快照（${(d.snapshots||[]).length}）</h2>${tbl(['步号','Agent','阶段','状态','错误','时间'],
+        (d.snapshots||[]).map(s=>[esc(s.step_index),esc(s.agent_id),esc(s.phase),tag(s.status),
+          `<span class="mono">${esc(String(s.error||'').slice(0,40))}</span>`,esc(fmtTime(s.created_at))]))}</div>`+
+      `<div class="card"><h2>结构化日志（${(d.logs||[]).length}）</h2>${tbl(['级别','模块','消息','错误码','时间'],
+        (d.logs||[]).map(l=>[tag(l.level),esc(l.module),esc(String(l.message||'').slice(0,70)),
+          `<span class="mono">${esc(l.error_code||'-')}</span>`,esc(fmtTime(l.created_at))]))}</div>`+
+      `<div class="card"><h2>工具审计（${(d.audit||[]).length}）</h2>${tbl(['工具','权限','状态','错误码','耗时'],
+        (d.audit||[]).map(a=>[esc(a.tool),esc(a.permission),tag(a.status),
+          `<span class="mono">${esc(a.error_code||'-')}</span>`,esc(a.duration_ms??'-')]))}</div>`;
+  }catch(e){ out.innerHTML=`<div class="note err">${esc(e.message)}</div>`; }
+}
+async function doResolve(){
+  const code=document.getElementById('rs-code').value.trim();
+  const note=document.getElementById('rs-note').value.trim();
+  try{ const d=await api('incidents/resolve',{method:'POST',body:JSON.stringify({code,resolution:note||'已排查处理'})});
+    document.getElementById('rs-out').innerHTML=`<div class="note">${d.ok?'✅ 已标记解决：'+esc(d.code):'⚠️ 未找到或已解决：'+esc(d.code)}</div>`;
+  }catch(e){ document.getElementById('rs-out').innerHTML=`<div class="note err">${esc(e.message)}（该操作需超管令牌）</div>`; }
+}
+
+async function renderEvents(v,id){
+  if(id==='ev-stream'){
+    v.innerHTML=head('4.1 事件订阅','SSE 实时推送：平台每执行一步，此处即时出现，无需刷新')+
+      `<div class="note">下方事件流由后台与平台共享的 events 表驱动，连接状态见右上角指示灯。</div>`+
+      `<div class="card"><div class="bar"><button class="btn" onclick="window._feed=[];document.getElementById('feed').innerHTML=''">清空视图</button>
+      <span class="hint">仅清空当前页面显示，不删除库中事件</span></div><div id="feed"></div></div>`;
+    window._feed=[];
+  } else if(id==='ev-search'){
+    const d=await api('events?after_id=0&limit=200');
+    v.innerHTML=head('4.2 事件检索','按类型/会话过滤平台实时事件')+
+      `<div class="bar"><select id="f-kind" onchange="filterEvents()"><option value="">全部类型</option>
+      ${[...new Set(d.events.map(e=>e.kind))].map(k=>`<option value="${esc(k)}">${esc(k)}</option>`).join('')}</select>
+      <button class="btn" onclick="render('ev-search')">刷新</button></div>
+      <div class="card" id="ev-tbl"></div></div>`;
+    window._events=d.events; filterEvents();
+  } else {
+    const d=await api('consistency');
+    v.innerHTML=head('4.3 一致性对账','前端每轮任务 vs 后台记录，交叉比对')+
+      `<div class="note"><b>${esc(d.conclusion)}</b></div>`+
+      `<div class="card"><pre>${esc(JSON.stringify(d,null,2))}</pre></div>`;
+  }
+}
+function filterEvents(){
+  const k=document.getElementById('f-kind').value;
+  const rows=(window._events||[]).filter(e=>!k||e.kind===k);
+  document.getElementById('ev-tbl').innerHTML=tbl(['ID','时间','类型','会话','Actor','状态','摘要','耗时'],
+    rows.map(e=>[esc(e.id),esc(fmtTime(e.created_at)),`<span class="tag">${esc(e.kind)}</span>`,
+      `<span class="mono">${esc(String(e.session_id||'-').slice(0,14))}</span>`,esc(e.actor||'-'),
+      tag(e.status||'-'),esc(e.summary||''),esc(e.duration_ms??'-')]));
+}
+
+async function renderAgents(v,id){
+  const d=await api('catalog');
+  if(id==='ag-list'){
+    v.innerHTML=head('5.1 Agent 注册与角色','平台五类角色')+
+      `<div class="card">${tbl(['Agent ID','名称','工具','技能'],(d.agents||[]).map(a=>[
+        `<span class="mono">${esc(a.id||'')}</span>`,esc(a.name||''),esc((a.tools||[]).join(', ')||'-'),
+        esc((a.skills||[]).join(', ')||'-')]))}</div>`+
+      `<div class="note">另有总控 Supervisor、管理者 Manager、流转 Handoff、恢复 Recovery 等角色，
+      由编排层统一调度，详见平台执行链。</div>`;
+  } else if(id==='ag-route'){
+    v.innerHTML=head('5.2 分派与路由配置','两级 / N 级分派由平台配置驱动')+
+      `<div class="note">通道（chat / work）由用户在界面显式选择，消息内容不参与模式判定；
+      本轮动作由模型语义决定（reply / document / task），关键词不作为串模式依据。</div>`+
+      `<div class="card"><pre>config/routing.yaml · config/policy.yaml · config/agents.yaml
+路由规则仅用于可观测展示，不参与通道判定。</pre></div>`;
+  } else {
+    v.innerHTML=head('5.3 工作流与策略','重试 / 超时 / 快照保留 / 确认模式')+
+      `<div class="card"><pre>快照：每步必写（含失败/中断），滚动归档
+恢复：复用原计划，不重新规划
+确认：AP_CONFIRM_MODE=approve（Web 自动放行，CLI 人工确认）
+注入：TOOL_ERROR / INTERRUPTED 用于验证恢复链路</pre></div>`;
+  }
+}
+
+async function renderCatalog(v,id){
+  const d=await api('catalog');
+  if(id==='ct-tools'){
+    v.innerHTML=head('6.1 工具注册表',`共 ${(d.tools||[]).length} 个工具`)+
+      `<div class="card">${tbl(['名称','处理器','权限'],(d.tools||[]).map(t=>[
+        `<span class="mono">${esc(t.name||'')}</span>`,
+        `<span class="mono">${esc(t.local_handler||t.mcp_server||'-')}</span>`,esc(t.permission||'-')]))}</div>`;
+  } else if(id==='ct-skills'){
+    v.innerHTML=head('6.2 技能目录',`共 ${(d.skills||[]).length} 个技能`)+
+      `<div class="card">${tbl(['标识','中文名','说明'],(d.skills||[]).map(s=>[
+        `<span class="mono">${esc(s.name)}</span>`,esc(s.title),esc(String(s.description||'').slice(0,80))]))}</div>`;
+  } else {
+    v.innerHTML=head('6.3 MCP 连接器','本地 MCP 服务与暴露工具')+
+      `<div class="note">MCP 连接由平台启动时建立；本后台从共享库与配置读取清单，
+      不重复拉起 MCP 子进程，避免与平台争抢资源。</div>`+
+      `<div class="card">${tbl(['工具','服务'],(d.tools||[]).filter(t=>t.mcp_server).map(t=>[
+        `<span class="mono">${esc(t.name)}</span>`,esc(t.mcp_server)]))}</div>`;
+  }
+}
+
+async function renderKb(v,id){
+  const d=await api('catalog');
+  if(id==='kb-docs'){
+    v.innerHTML=head('7.1 文档索引',`已入库 ${(d.documents||[]).length} 篇`)+
+      `<div class="card">${tbl(['文档 ID','标题','来源','切块','时间'],(d.documents||[]).map(x=>[
+        `<span class="mono">${esc(String(x.doc_id).slice(0,16))}</span>`,esc(x.title||'-'),
+        `<span class="mono">${esc(String(x.source||'').slice(0,40))}</span>`,esc(x.chunks),esc(fmtTime(x.created_at))]))}</div>`;
+  } else {
+    v.innerHTML=head('7.2 检索命中','知识检索采用本地向量/关键词混合，命中记录可溯源')+
+      `<div class="note">检索命中结果随会话快照落库，在「1.4 快照与上下文回放」与
+      「3.3 关联证据串联」中可查看引用来源。</div>`;
+  }
+}
+
+async function renderSecurity(v,id){
+  const d=await api('security');
+  if(id==='sc-check'||id==='sc-db'){
+    v.innerHTML=head(id==='sc-check'?'8.1 安全基线核查':'8.4 数据库防护','实时检查结果，非计划项')+
+      `<div class="card">${tbl(['检查项','结果','说明'],d.checks.map(c=>[
+        esc(c.item),c.ok?'<span class="tag ok">通过</span>':'<span class="tag err">需处理</span>',esc(c.note)]))}</div>`+
+      `<div class="note">数据库类型：<b>${esc(d.dialect)}</b>。所有业务 SQL 均经 Repository 参数化绑定；
+      后台以独立只读连接查询，不直接暴露写库接口给前端。</div>`;
+  } else if(id==='sc-audit'){
+    v.innerHTML=head('8.2 审计日志','后台登录、处置、备份操作留痕（append-only）')+
+      `<div class="card">${tbl(['时间','操作者','动作','对象','摘要'],(d.audit||[]).map(a=>[
+        esc(fmtTime(a.created_at)),esc(a.actor),tag(a.action),esc(a.target||'-'),
+        `<span class="mono">${esc(String(a.detail||'').slice(0,60))}</span>`]))}</div>`;
+  } else {
+    v.innerHTML=head('8.3 密钥与配置','掩码展示，不回传明文')+
+      `<div class="note">API Key 仅从环境变量 / 本机受限文件（权限 600）读取，不入库、不入日志、
+      不回传状态接口明文。后台不提供密钥明文读取接口。</div>`+
+      `<div class="card"><pre>AP_LLM_API_KEY      → ******（已配置，掩码）
+AP_ADMIN_TOKEN      → ******（超管）
+AP_ADMIN_VIEW_TOKEN → ******（只读）
+AP_DB_DSN           → ${esc(d.dialect)}://***</pre></div>`;
+  }
+}
+
+async function renderSandbox(v,id){
+  const d=await api('sandbox');
+  if(id==='sb-view'){
+    v.innerHTML=head('9.1 隔离视图','按通道与归属两个维度查看会话分布')+
+      `<div class="card"><h2>通道分布</h2>${tbl(['通道','会话数'],d.channels.map(c=>[tag(c.channel),esc(c.n)]))}</div>`+
+      `<div class="card"><h2>归属分布</h2>${tbl(['归属','会话数'],d.owners.map(o=>[esc(o.owner),esc(o.n)]))}</div>`+
+      `<div class="note">历史会话归 <b>default</b>；新增 owner 维度后，跨归属访问同一会话返回
+      409 OWNER_ISOLATION，与通道隔离叠加生效。</div>`;
+  } else {
+    v.innerHTML=head('9.2 隔离规则','分层隔离，逐层生效')+
+      `<div class="card">${tbl(['层次','状态','说明'],d.rules.map(r=>[
+        esc(r.layer),`<span class="tag ${r.status.includes('启用')?'ok':'warn'}">${esc(r.status)}</span>`,esc(r.detail)]))}</div>`;
+  }
+}
+
+async function renderSystem(v,id){
+  const d=await api('system');
+  if(id==='sy-status'){
+    v.innerHTML=head('10.1 容器状态','服务、重启策略与运行时长')+
+      `<div class="kv"><div><b>版本</b>：${esc(d.version)}</div>
+      <div><b>运行时长</b>：${d.uptime_seconds}s</div>
+      <div><b>数据库</b>：${esc(d.dialect)}</div>
+      <div><b>DSN</b>：<span class="mono">${esc(d.dsn_masked)}</span></div></div></div>`+
+      `<div class="card">${tbl(['服务','地址','重启策略'],d.services.map(s=>[
+        esc(s.name),`<span class="mono">${esc(s.url)}</span>`,esc(s.restart_policy)]))}</div>`;
+  } else if(id==='sy-deploy'){
+    v.innerHTML=head('10.2 一键部署','Docker Compose，简单快速')+
+      `<div class="card"><pre>./deploy.sh up       # 构建并启动（含 healthcheck + 自动重启）
+./deploy.sh status   # 查看服务状态与健康
+./deploy.sh logs     # 跟随日志
+./deploy.sh backup   # 一致性数据库备份
+./deploy.sh down     # 停止</pre></div>`+
+      `<div class="note">部署方式仅为 Docker + Compose，不引入 Kubernetes / 复杂编排。
+      数据库仅挂载到内部卷、不对公网暴露端口。</div>`;
+  } else if(id==='sy-backup'){
+    v.innerHTML=head('10.3 备份与恢复','SQLite 官方 backup API，WAL 状态下一致性快照')+
+      `<div class="bar"><button class="btn primary" onclick="doBackup()">立即备份</button></div><div id="bk-out"></div>`+
+      `<div class="card"><h2>已有备份（${d.backups.length}）</h2>${tbl(['文件','大小','时间'],d.backups.map(b=>[
+        `<span class="mono">${esc(b.name)}</span>`,esc(b.size+' B'),esc(b.created_at)]))}</div>`;
+  } else {
+    v.innerHTML=head('10.4 压测与容量报告','如实标注已验证与未验证范围')+
+      `<div class="card"><pre>部署形态：platform + admin 双进程，共享 SQLite(WAL) 数据库
+读路径：多进程并发读，WAL 不阻塞
+写路径：单写者串行化（SQLite 限制）
+已具备：上百人量级的日常使用基础 + 健康检查 + 自动重启 + 一致性备份
+需扩展：上千人同时高强度写入 → 切换 PostgreSQL（schema 已备）+ 连接池 + 水平扩容
+未承诺：未在千并发压测环境下验证，不宣称「上千人不卡顿」已达标</pre></div>`+
+      `<div class="note">容量结论以实测为准。若需支撑千并发，请启用 docker-compose 的
+      postgres profile 并设置 AP_DB_DSN，再执行压测脚本取得真实指标。</div>`;
+  }
+}
+async function doBackup(){
+  try{ const d=await api('backup',{method:'POST'});
+    document.getElementById('bk-out').innerHTML=`<div class="note ${d.ok?'':'err'}">${esc(JSON.stringify(d))}</div>`;
+  }catch(e){ document.getElementById('bk-out').innerHTML=`<div class="note err">${esc(e.message)}（需超管令牌）</div>`; }
+}
+
+// ---- SSE 实时事件流 ----
+let es=null;
+function startStream(){
+  if(es) es.close();
+  const url=API('stream')+'?token='+encodeURIComponent(TOKEN);
+  es=new EventSource(url);
+  const live=document.getElementById('live');
+  es.onopen=()=>{ live.classList.add('on'); live.querySelector('span').textContent='实时已连接'; };
+  es.onerror=()=>{ live.classList.remove('on'); live.querySelector('span').textContent='重连中…'; };
+  es.onmessage=(ev)=>{
+    try{
+      const d=JSON.parse(ev.data);
+      window._feed=window._feed||[];
+      window._feed.unshift(d); if(window._feed.length>300) window._feed.pop();
+      const feed=document.getElementById('feed');
+      if(feed){
+        const row=document.createElement('div'); row.className='row';
+        row.innerHTML=`<span class="t">${esc(fmtTime(d.created_at))}</span>
+          <span class="k">${esc(d.kind)}</span><span class="s">${esc(d.summary||'')}
+          ${d.status?` · ${esc(d.status)}`:''}${d.duration_ms!=null?` · ${d.duration_ms}ms`:''}</span>`;
+        feed.insertBefore(row, feed.firstChild);
+        while(feed.childNodes.length>120) feed.removeChild(feed.lastChild);
+      }
+    }catch(e){}
+  };
+}
+
+// 安全要求：不做 URL 自动登录、不做 sessionStorage 恢复；每次访问都必须手动输入令牌。
+document.getElementById('tok').addEventListener('keydown', e=>{ if(e.key==='Enter') doLogin(); });
+</script>
+<script src="./console_ext.js"></script>
+</body>
+</html>

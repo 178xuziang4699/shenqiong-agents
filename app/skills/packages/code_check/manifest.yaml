@@ -1,0 +1,40 @@
+name: code_check
+version: 1.0.0
+description: 对生成代码做语法自检（Python 走 ast.parse，其它语言做括号配对与空内容检查）
+entry: skill.py:run
+triggers:
+  intents: [code_gen]
+  keywords: [语法检查, 自检, 校验代码]
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    code:
+      type: string
+      description: 待检查的源码
+    language:
+      type: string
+      description: 源码语言
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 20
+category: 代码工程
+color: '#0d9488'
+sample_args:
+  code: |
+    def fib(n: int) -> list[int]:
+        a, b = 0, 1
+        out = []
+        for _ in range(n):
+            out.append(a)
+            a, b = b, a + b
+        return out
+
+
+    if __name__ == "__main__":
+        print(fib(10))
+  language: python
+origin: local

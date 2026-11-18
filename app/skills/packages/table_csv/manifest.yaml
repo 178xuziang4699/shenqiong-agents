@@ -1,0 +1,25 @@
+name: table_csv
+version: 1.0.0
+description: 把结构化数据生成标准 CSV 表格文本（带表头、自动转义、UTF-8），可直接保存为 .csv 打开
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords: [生成表格, csv, 导出表格, 数据表]
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    title:
+      type: string
+      description: 表格用途说明
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 数据办公
+color: '#b45309'
+sample_args:
+  title: 项目任务跟踪表
+origin: local

@@ -1,0 +1,27 @@
+name: csv_to_markdown
+version: 1.0.0
+description: CSV 转 Markdown 表格
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - Markdown
+  - 表格
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    path:
+      type: string
+      description: 参数 path
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 数据结构化
+color: '#7c3aed'
+sample_args:
+  path: samples/sample.csv
+origin: local

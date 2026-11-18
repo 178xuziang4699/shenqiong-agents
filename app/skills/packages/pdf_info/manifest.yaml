@@ -1,0 +1,27 @@
+name: pdf_info
+version: 1.0.0
+description: 读取 PDF 页数、尺寸等元信息
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - PDF
+  - 元信息
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    path:
+      type: string
+      description: 参数 path
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 文档与文件
+color: '#d97706'
+sample_args:
+  path: samples/sample.pdf
+origin: local

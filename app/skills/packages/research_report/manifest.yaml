@@ -1,0 +1,25 @@
+name: research_report
+version: 1.0.0
+description: 对指定主题产出结构化调研报告（执行摘要 / 格局 / 驱动 / 参与者 / 政策 / 机会风险 / 结论 / 待核实清单）
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords: [调研, 市场分析, 行业研究, 研究报告]
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    spec:
+      type: string
+      description: 调研主题或完整需求，例如「调研一下德国AI市场」
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 60
+category: 办公文档
+color: '#0f766e'
+sample_args:
+  spec: 调研一下德国AI市场
+origin: local

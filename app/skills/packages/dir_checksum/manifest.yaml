@@ -1,0 +1,27 @@
+name: dir_checksum
+version: 1.0.0
+description: 计算目录下文件的聚合校验和
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 校验和
+  - 目录
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    path:
+      type: string
+      description: 参数 path
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 系统与工具
+color: '#475569'
+sample_args:
+  path: samples
+origin: local

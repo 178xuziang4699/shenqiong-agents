@@ -1,0 +1,35 @@
+name: markdown_to_html
+version: 1.0.0
+description: Markdown 渲染为 HTML
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - Markdown
+  - 渲染
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    text:
+      type: string
+      description: 参数 text
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 数据结构化
+color: '#7c3aed'
+sample_args:
+  text: '# 标题
+
+
+    - 项目一
+
+    - 项目二
+
+
+    **加粗**'
+origin: local

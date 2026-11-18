@@ -1,0 +1,31 @@
+name: report_html
+version: 1.0.0
+description: 生成 HTML 报告并落盘
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 报告
+  - HTML
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    title:
+      type: string
+      description: 参数 title
+    body:
+      type: string
+      description: 参数 body
+dependencies:
+  tools: []
+permissions: write
+timeout_seconds: 30
+category: 文档与文件
+color: '#d97706'
+sample_args:
+  title: 能力探测报告
+  body: 本报告由本地技能真实生成，用于验证技能可执行。
+origin: local

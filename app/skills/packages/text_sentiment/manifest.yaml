@@ -1,0 +1,27 @@
+name: text_sentiment
+version: 1.0.0
+description: 基于情感词典做倾向打分
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 情感
+  - 倾向
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    text:
+      type: string
+      description: 参数 text
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 文本处理
+color: '#2563eb'
+sample_args:
+  text: 执行完成，结果清晰，没有失败和风险，提升明显。
+origin: local

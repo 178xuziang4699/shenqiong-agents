@@ -1,0 +1,27 @@
+name: docx_inspect
+version: 1.0.0
+description: 读取 Word 段落与表格数
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - Word
+  - docx
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    path:
+      type: string
+      description: 参数 path
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 文档与文件
+color: '#d97706'
+sample_args:
+  path: samples/sample.docx
+origin: local

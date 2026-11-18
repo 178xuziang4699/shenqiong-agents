@@ -1,0 +1,31 @@
+name: text_regex
+version: 1.0.0
+description: 按正则抽取匹配片段
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 正则
+  - 抽取
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    text:
+      type: string
+      description: 参数 text
+    pattern:
+      type: string
+      description: 参数 pattern
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 文本处理
+color: '#2563eb'
+sample_args:
+  text: 2000 元以下主管审批，10000 元以上财务总监审批
+  pattern: \d+\s*元
+origin: local

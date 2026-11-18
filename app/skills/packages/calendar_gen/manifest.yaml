@@ -1,0 +1,29 @@
+name: calendar_gen
+version: 1.0.0
+description: 生成指定年月的月历矩阵
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 日历
+  - 月历
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    year:
+      type: integer
+    month:
+      type: integer
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 系统与工具
+color: '#475569'
+sample_args:
+  year: 2026
+  month: 11
+origin: local

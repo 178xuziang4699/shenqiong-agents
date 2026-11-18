@@ -1,0 +1,28 @@
+name: html_extract
+version: 1.0.0
+description: 提取 HTML 正文、标题与链接
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - HTML
+  - 抓取
+  - 正文
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    path:
+      type: string
+      description: 参数 path
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 数据结构化
+color: '#7c3aed'
+sample_args:
+  path: samples/sample.html
+origin: local

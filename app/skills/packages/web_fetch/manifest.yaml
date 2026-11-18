@@ -1,0 +1,26 @@
+name: web_fetch
+version: 1.0.0
+description: 抓取公开网页并提取标题与纯文本正文（真实联网请求，去脚本样式与标签），供调研与资料整理使用
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords: [抓取网页, 读取网页, 网页正文, url]
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    url:
+      type: string
+      description: 以 http:// 或 https:// 开头的网页地址
+    limit:
+      type: integer
+permissions: read
+timeout_seconds: 30
+category: 信息采集
+color: '#7c3aed'
+sample_args:
+  url: http://127.0.0.1:8000/health
+  limit: 2000
+origin: local

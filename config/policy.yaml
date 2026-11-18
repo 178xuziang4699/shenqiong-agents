@@ -1,0 +1,45 @@
+# ============================================================
+# 运行时策略：并发 / 超时 / 重试 / 人工确认 / 恢复动作 / 快照保留
+# 所有值都可由环境变量覆盖（${VAR:-default} 语法）
+# ============================================================
+
+concurrency:
+  max_workers: "${AP_MAX_WORKERS:-5}"        # 单机并发上限
+
+timeouts:
+  subtask_seconds: "${AP_SUBTASK_TIMEOUT:-300}"   # 单个子任务超时
+  tool_seconds: "${AP_TOOL_TIMEOUT:-30}"          # 单次工具调用超时
+  mcp_startup_seconds: 15
+
+retry:
+  max_attempts: "${AP_RETRY_MAX:-3}"         # 失败重试 3 次
+  base_delay_seconds: 0.3                    # 指数退避基数
+  max_delay_seconds: 8.0
+  jitter: 0.15                               # 抖动比例，避免同刻重试
+  retry_on: [TIMEOUT, TOOL_ERROR, LLM_ERROR, UNKNOWN]
+
+confirmation:
+  mode: "${AP_CONFIRM_MODE:-prompt}"         # prompt | approve | reject | scripted
+  script: "${AP_CONFIRM_SCRIPT:-}"           # scripted 模式：approve,approve,reject
+  require_before_write: true                 # 关键写操作前必须人工确认（默认开启，勿关）
+  write_permissions: [write, dangerous]      # 哪些权限级别算"关键写操作"
+
+recovery:
+  max_bounces: 2                             # 校验不通过最多打回次数，超过上报总控
+  actions:                                   # 错误归类 → 修复动作
+    INTERRUPTED: resume_from_breakpoint
+    TIMEOUT: retry_then_swap_executor
+    TOOL_ERROR: retry_then_degrade
+    SCHEMA_INVALID: retry_once_then_escalate
+    VALIDATION_FAILED: bounce_to_executor
+    HUMAN_REJECTED: request_human_confirm
+    LLM_ERROR: retry_then_degrade
+    UNKNOWN: escalate
+
+snapshots:
+  keep_last: "${AP_SNAPSHOT_KEEP:-200}"      # 每 session 保留最近 200 步，超出滚动归档
+
+logging:
+  level: "${AP_LOG_LEVEL:-INFO}"
+  file: logs/runtime.jsonl
+  max_context_chars: 240                     # 上下文摘要截断长度（避免落敏感原文）

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>下载 智能体 Agent · 手机版</title>
+<style>
+  :root{--fg:#101828;--fg2:#475467;--mut:#98a2b3;--line:#e7eaf0;--acc:#5925dc;--bg:#f7f8fc}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    -webkit-font-smoothing:antialiased}
+  .wrap{max-width:820px;margin:0 auto;padding:36px 20px 60px}
+  .top{display:flex;align-items:center;gap:10px;color:var(--fg2);font-size:13px;margin-bottom:26px}
+  .top a{color:var(--acc);text-decoration:none}
+  .card{background:#fff;border:1px solid var(--line);border-radius:20px;
+    box-shadow:0 12px 40px rgba(16,24,40,.06);overflow:hidden}
+  .hero{display:flex;gap:22px;align-items:center;padding:30px 32px 22px;flex-wrap:wrap}
+  .hero img.ico{width:88px;height:88px;border-radius:20px;flex:none;
+    box-shadow:0 6px 18px rgba(89,37,220,.18)}
+  .hero h1{font-size:26px;margin:0 0 6px;letter-spacing:-.4px}
+  .hero .sub{color:var(--fg2);font-size:14px;line-height:1.6;margin:0}
+  .badges{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+  .badge{font-size:11.5px;color:var(--fg2);background:#f2f4f7;border:1px solid var(--line);
+    padding:3px 10px;border-radius:99px}
+  .main{display:grid;grid-template-columns:1fr 220px;gap:0;border-top:1px solid var(--line)}
+  .left{padding:26px 32px 30px;border-right:1px solid var(--line);min-width:0}
+  .right{padding:26px 24px;text-align:center;background:#fcfcfe}
+  .btn{display:block;width:100%;padding:15px 20px;border:0;border-radius:12px;
+    background:var(--acc);color:#fff;font-size:16px;font-weight:600;text-align:center;
+    text-decoration:none;cursor:pointer;transition:.15s;box-shadow:0 6px 18px rgba(89,37,220,.22)}
+  .btn:hover{background:#4819b8}
+  .btn .sm{display:block;font-size:11px;font-weight:400;opacity:.85;margin-top:4px}
+  .url{margin:12px 0 0;font-size:11.5px;color:var(--mut);word-break:break-all;line-height:1.5;
+    background:#f8f9fc;border:1px dashed var(--line);border-radius:9px;padding:9px 11px}
+  .url b{color:var(--fg2);font-weight:600}
+  .qr img{width:170px;height:170px;image-rendering:pixelated;border-radius:10px;
+    border:1px solid var(--line);background:#fff}
+  .qr p{font-size:12px;color:var(--fg2);line-height:1.6;margin:10px 0 0}
+  .sec{margin-top:26px}
+  .sec h3{font-size:13.5px;margin:0 0 12px;color:var(--fg)}
+  .steps{list-style:none;padding:0;margin:0}
+  .steps li{display:flex;gap:11px;font-size:13px;color:var(--fg2);line-height:1.65;
+    padding:7px 0;align-items:flex-start}
+  .steps .n{width:20px;height:20px;border-radius:50%;background:#eef0ff;color:var(--acc);
+    font-size:11px;font-weight:700;display:grid;place-items:center;flex:none;margin-top:1px}
+  .note{margin-top:24px;background:#f8f9fc;border:1px solid var(--line);border-radius:12px;
+    padding:14px 16px;font-size:12px;color:var(--fg2);line-height:1.75}
+  .note b{color:var(--fg)}
+  .foot{text-align:center;color:var(--mut);font-size:11.5px;margin-top:22px;line-height:1.7}
+  @media(max-width:640px){
+    .wrap{padding:20px 14px 40px}
+    .hero{padding:24px 20px 18px;gap:16px}
+    .hero img.ico{width:68px;height:68px}
+    .hero h1{font-size:22px}
+    .main{grid-template-columns:1fr}
+    .left{padding:22px 20px;border-right:0;border-bottom:1px solid var(--line);order:2}
+    .right{padding:22px 20px;order:1}
+    .qr img{width:150px;height:150px}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">&#8592; <a href="/">返回平台网页版</a> <span>/</span> 手机版下载</div>
+
+  <div class="card">
+    <div class="hero">
+      <img class="ico" src="/static/download/app_icon.png" alt="App 图标">
+      <div style="flex:1;min-width:220px">
+        <h1>智能体 Agent</h1>
+        <p class="sub">把整套多智能体平台装进手机：聊天、写文档、做调研、写代码、用技能，一句话就办。</p>
+        <div class="badges">
+          <span class="badge">Android 5.0+</span>
+          <span class="badge">v1.0.0</span>
+          <span class="badge" id="size-badge">约 41 KB</span>
+          <span class="badge">官方构建 · 已签名</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="left">
+        <a class="btn" id="dl-btn" href="/app.apk">
+          &#11015; 立即下载安装包（APK）
+          <span class="sm">点击后浏览器会自动开始下载 · 文件名 智能体Agent.apk</span>
+        </a>
+        <p class="url"><b>下载直链（可复制到手机浏览器）：</b><br>
+          <span id="full-url">https://your-host.example/app.apk</span></p>
+
+        <div class="sec">
+          <h3>安装步骤</h3>
+          <ol class="steps">
+            <li><span class="n">1</span><span>用手机浏览器打开本页，点上面的「立即下载安装包」；或扫右侧二维码。</span></li>
+            <li><span class="n">2</span><span>下载完成后点开 APK。系统提示「未知来源应用」时，允许本浏览器安装（这是自签名应用的正常提示，选择允许即可）。</span></li>
+            <li><span class="n">3</span><span>装好后在桌面找到「智能体 Agent」，点开即用，无需再输网址。</span></li>
+          </ol>
+        </div>
+
+        <div class="note">
+          <b>如实说明：</b>这是把平台封装成独立 App 的客户端，打开后全屏进入你现在的在线平台，
+          因此<b>需要联网</b>才能对话和办公。对话质量由你在平台里接入的模型（当前为 DeepSeek）决定；
+          <b>API 密钥只保存在服务端，不会打包进手机</b>，更安全。若以后平台换了网址，
+          在 App 里<b>长按底部地址栏</b>即可改成新地址，无需重装。
+        </div>
+      </div>
+
+      <div class="right">
+        <div class="qr">
+          <p style="font-size:12px;color:#667085;line-height:1.7">部署到自己的域名后，<br>可自行生成下载二维码替换此处。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="foot">
+    智能体 Agent · Android 客户端 &nbsp;|&nbsp; 与网页版数据是同一套，聊天记录互通<br>
+    安装问题或需要换成你自己的服务地址，可在 App 内长按底部地址栏修改。
+  </div>
+</div>
+
+<script>
+// 直链使用当前站点地址；部署到自己的域名后无需改动
+(function () {
+  var base = location.origin;
+  var apk = base + '/app.apk';
+  document.getElementById('dl-btn').href = apk;
+  document.getElementById('full-url').textContent = apk;
+  var back = document.querySelector('.top a');
+  if (back) back.href = base + '/';
+})();
+</script>
+</body>
+</html>

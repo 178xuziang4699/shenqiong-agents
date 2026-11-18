@@ -1,0 +1,824 @@
+# ============================================================
+# MCP 工具注册表（统一入口）
+# transport: stdio  → 真实 MCP 子进程（JSON-RPC 2.0 / newline 分帧）
+# transport: local  → 进程内工具（知识库等内部能力），仍走同一套
+#                     校验 / 权限 / 审计链路，业务代码不直连
+# permission: read | write | dangerous
+#   write / dangerous 属于"关键写操作"，执行前必须输出动作并等待确认
+# ============================================================
+
+servers:
+  - name: fs
+    transport: stdio
+    command: ["python", "-u", "-m", "app.tools.servers.fs_server"]
+    cwd: "."
+    env:
+      AP_WORKSPACE: "${AP_WORKSPACE:-.}"
+  - name: calc
+    transport: stdio
+    command: ["python", "-u", "-m", "app.tools.servers.calc_server"]
+    cwd: "."
+  - name: util
+    transport: stdio
+    command: ["python", "-u", "-m", "app.tools.servers.util_server"]
+    cwd: "."
+
+tools:
+  - name: fs.list_dir
+    server: fs
+    remote_name: list_dir
+    permission: read
+    timeout_seconds: 10
+    description: 列出目录下的文件与大小
+    input_schema:
+      type: object
+      required: [path]
+      properties:
+        path:
+          type: string
+          description: 相对工作区根目录的路径
+
+  - name: fs.read_text
+    server: fs
+    remote_name: read_text
+    permission: read
+    timeout_seconds: 10
+    description: 读取文本文件内容
+    input_schema:
+      type: object
+      required: [path]
+      properties:
+        path: {type: string}
+        max_chars: {type: integer, minimum: 1, maximum: 200000}
+
+  - name: fs.write_text
+    server: fs
+    remote_name: write_text
+    permission: write
+    timeout_seconds: 10
+    description: 写入文本文件（关键写操作，需人工确认）
+    input_schema:
+      type: object
+      required: [path, content]
+      properties:
+        path: {type: string}
+        content: {type: string}
+        overwrite: {type: boolean}
+
+  - name: calc.word_count
+    server: calc
+    remote_name: word_count
+    permission: read
+    timeout_seconds: 10
+    description: 统计文本字数（中英文混合）
+    input_schema:
+      type: object
+      required: [text]
+      properties:
+        text: {type: string}
+
+  - name: calc.eval
+    server: calc
+    remote_name: eval
+    permission: read
+    timeout_seconds: 5
+    description: 计算算术表达式（仅四则运算与括号）
+    input_schema:
+      type: object
+      required: [expression]
+      properties:
+        expression: {type: string, pattern: "^[0-9+\\-*/(). ]+$"}
+
+  - name: kb.search
+    server: kb
+    transport: local
+    local_handler: "app.knowledge.retriever:search_tool"
+    permission: read
+    timeout_seconds: 15
+    description: 知识库检索召回（返回结果带来源引用）
+    input_schema:
+      type: object
+      required: [query]
+      properties:
+        query: {type: string}
+        top_k: {type: integer, minimum: 1, maximum: 20}
+
+  - name: kb.ingest
+    server: kb
+    transport: local
+    local_handler: "app.knowledge.ingest:ingest_tool"
+    permission: write
+    timeout_seconds: 60
+    description: 文档入库：切分 → 向量化 → 落库（关键写操作，需人工确认）
+    input_schema:
+      type: object
+      required: [path]
+      properties:
+        path: {type: string}
+        title: {type: string}
+
+  - name: util.text_summarize
+    server: util
+    remote_name: text_summarize
+    permission: read
+    timeout_seconds: 20
+    description: 按句子信息密度抽取要点摘要
+    input_schema:
+      type: object
+      required: []
+      properties:
+        text: {type: string}
+        max_points: {type: integer}
+
+  - name: util.text_wordcount
+    server: util
+    remote_name: text_wordcount
+    permission: read
+    timeout_seconds: 20
+    description: 统计中英文字数、行数与高频词
+    input_schema:
+      type: object
+      required: []
+      properties:
+        text: {type: string}
+
+  - name: util.text_keywords
+    server: util
+    remote_name: text_keywords
+    permission: read
+    timeout_seconds: 20
+    description: 基于词频抽取关键词
+    input_schema:
+      type: object
+      required: []
+      properties:
+        text: {type: string}
+        top_k: {type: integer}
+
+  - name: util.text_diff
+    server: util
+    remote_name: text_diff
+    permission: read
+    timeout_seconds: 20
+    description: 生成两段文本的 unified diff 与相似度
+    input_schema:
+      type: object
+      required: []
+      properties:
+        left: {type: string}
+        right: {type: string}
+
+  - name: util.text_regex
+    server: util
+    remote_name: text_regex
+    permission: read
+    timeout_seconds: 20
+    description: 按正则抽取匹配片段
+    input_schema:
+      type: object
+      required: []
+      properties:
+        text: {type: string}
+        pattern: {type: string}
+
+  - name: util.text_replace
+    server: util
+    remote_name: text_replace
+    permission: read
+    timeout_seconds: 20
+    description: 按术语映射批量替换
+    input_schema:
+      type: object
+      required: []
+      properties:
+        text: {type: string}
+        mapping: {type: object}
+
+  - name: util.text_case
+    server: util
+    remote_name: text_case
+    permission: read
+    timeout_seconds: 20
+    description: 命名风格转换 snake / camel / kebab / upper
+    input_schema:
+      type: object
+      required: []
+      properties:
+        text: {type: string}
+        style: {type: string}
+
+  - name: util.text_humanize
+    server: util
+    remote_name: text_humanize
+    permission: read
+    timeout_seconds: 20
+    description: 去除常见 AI 套话，压缩冗余表述
+    input_schema:
+      type: object
+      required: []
+      properties:
+        text: {type: string}
+
+  - name: util.text_glossary
+    server: util
+    remote_name: text_glossary
+    permission: read
+    timeout_seconds: 20
+    description: 按术语表做确定性翻译替换
+    input_schema:
+      type: object
+      required: []
+      properties:
+        text: {type: string}
+        glossary: {type: object}
+
+  - name: util.text_chunk
+    server: util
+    remote_name: text_chunk
+    permission: read
+    timeout_seconds: 20
+    description: 按长度与重叠度切分长文本
+    input_schema:
+      type: object
+      required: []
+      properties:
+        text: {type: string}
+        size: {type: integer}
+        overlap: {type: integer}
+
+  - name: util.text_dedupe
+    server: util
+    remote_name: text_dedupe
+    permission: read
+    timeout_seconds: 20
+    description: 按行去重并保持原顺序
+    input_schema:
+      type: object
+      required: []
+      properties:
+        text: {type: string}
+
+  - name: util.text_sentiment
+    server: util
+    remote_name: text_sentiment
+    permission: read
+    timeout_seconds: 20
+    description: 基于情感词典做倾向打分
+    input_schema:
+      type: object
+      required: []
+      properties:
+        text: {type: string}
+
+  - name: util.json_query
+    server: util
+    remote_name: json_query
+    permission: read
+    timeout_seconds: 20
+    description: 按点分路径读取 JSON 字段
+    input_schema:
+      type: object
+      required: []
+      properties:
+        json: {type: string}
+        path_expr: {type: string}
+
+  - name: util.json_validate
+    server: util
+    remote_name: json_validate
+    permission: read
+    timeout_seconds: 20
+    description: 校验必填字段是否齐全
+    input_schema:
+      type: object
+      required: []
+      properties:
+        json: {type: string}
+        required: {type: array}
+
+  - name: util.json_pretty
+    server: util
+    remote_name: json_pretty
+    permission: read
+    timeout_seconds: 20
+    description: 格式化 JSON 并输出摘要
+    input_schema:
+      type: object
+      required: []
+      properties:
+        json: {type: string}
+
+  - name: util.csv_profile
+    server: util
+    remote_name: csv_profile
+    permission: read
+    timeout_seconds: 20
+    description: CSV 列统计与数值摘要
+    input_schema:
+      type: object
+      required: []
+      properties:
+        path: {type: string}
+
+  - name: util.csv_filter
+    server: util
+    remote_name: csv_filter
+    permission: read
+    timeout_seconds: 20
+    description: 按列值条件筛选 CSV 行
+    input_schema:
+      type: object
+      required: []
+      properties:
+        path: {type: string}
+        column: {type: string}
+        op: {type: string}
+        value: {type: integer}
+
+  - name: util.csv_to_markdown
+    server: util
+    remote_name: csv_to_markdown
+    permission: read
+    timeout_seconds: 20
+    description: CSV 转 Markdown 表格
+    input_schema:
+      type: object
+      required: []
+      properties:
+        path: {type: string}
+
+  - name: util.yaml_to_json
+    server: util
+    remote_name: yaml_to_json
+    permission: read
+    timeout_seconds: 20
+    description: YAML 解析并转 JSON
+    input_schema:
+      type: object
+      required: []
+      properties:
+        path: {type: string}
+
+  - name: util.xml_to_dict
+    server: util
+    remote_name: xml_to_dict
+    permission: read
+    timeout_seconds: 20
+    description: XML 解析为结构树
+    input_schema:
+      type: object
+      required: []
+      properties:
+        path: {type: string}
+
+  - name: util.html_extract
+    server: util
+    remote_name: html_extract
+    permission: read
+    timeout_seconds: 20
+    description: 提取 HTML 正文、标题与链接
+    input_schema:
+      type: object
+      required: []
+      properties:
+        path: {type: string}
+
+  - name: util.markdown_to_html
+    server: util
+    remote_name: markdown_to_html
+    permission: read
+    timeout_seconds: 20
+    description: Markdown 渲染为 HTML
+    input_schema:
+      type: object
+      required: []
+      properties:
+        text: {type: string}
+
+  - name: util.table_sort
+    server: util
+    remote_name: table_sort
+    permission: read
+    timeout_seconds: 20
+    description: 按指定键排序记录列表
+    input_schema:
+      type: object
+      required: []
+      properties:
+        rows: {type: array}
+        key: {type: string}
+        reverse: {type: boolean}
+
+  - name: util.stats_describe
+    server: util
+    remote_name: stats_describe
+    permission: read
+    timeout_seconds: 20
+    description: 描述性统计：均值/中位数/标准差
+    input_schema:
+      type: object
+      required: []
+      properties:
+        values: {type: array}
+
+  - name: util.hash_digest
+    server: util
+    remote_name: hash_digest
+    permission: read
+    timeout_seconds: 20
+    description: 计算文本摘要（sha256 / md5 等）
+    input_schema:
+      type: object
+      required: []
+      properties:
+        text: {type: string}
+        algorithm: {type: string}
+
+  - name: util.base64_codec
+    server: util
+    remote_name: base64_codec
+    permission: read
+    timeout_seconds: 20
+    description: Base64 编码与解码
+    input_schema:
+      type: object
+      required: []
+      properties:
+        data: {type: string}
+        mode: {type: string}
+
+  - name: util.url_codec
+    server: util
+    remote_name: url_codec
+    permission: read
+    timeout_seconds: 20
+    description: URL 百分号编码与解码
+    input_schema:
+      type: object
+      required: []
+      properties:
+        data: {type: string}
+        mode: {type: string}
+
+  - name: util.uuid_gen
+    server: util
+    remote_name: uuid_gen
+    permission: read
+    timeout_seconds: 20
+    description: 生成 UUID v1 / v4
+    input_schema:
+      type: object
+      required: []
+      properties:
+        count: {type: integer}
+        version: {type: integer}
+
+  - name: util.password_gen
+    server: util
+    remote_name: password_gen
+    permission: read
+    timeout_seconds: 20
+    description: 用安全随机数生成密码并估算熵
+    input_schema:
+      type: object
+      required: []
+      properties:
+        length: {type: integer}
+        symbols: {type: boolean}
+
+  - name: util.jwt_payload
+    server: util
+    remote_name: jwt_payload
+    permission: read
+    timeout_seconds: 20
+    description: 解码 JWT payload（不验签，仅用于排查）
+    input_schema:
+      type: object
+      required: []
+      properties:
+        token: {type: string}
+
+  - name: util.color_convert
+    server: util
+    remote_name: color_convert
+    permission: read
+    timeout_seconds: 20
+    description: HEX / RGB / HSV / 亮度换算
+    input_schema:
+      type: object
+      required: []
+      properties:
+        hex: {type: string}
+
+  - name: util.cron_explain
+    server: util
+    remote_name: cron_explain
+    permission: read
+    timeout_seconds: 20
+    description: 把 cron 表达式翻译成自然语言
+    input_schema:
+      type: object
+      required: []
+      properties:
+        expression: {type: string}
+
+  - name: util.semver_compare
+    server: util
+    remote_name: semver_compare
+    permission: read
+    timeout_seconds: 20
+    description: 语义化版本比较
+    input_schema:
+      type: object
+      required: []
+      properties:
+        a: {type: string}
+        b: {type: string}
+
+  - name: util.regex_explain
+    server: util
+    remote_name: regex_explain
+    permission: read
+    timeout_seconds: 20
+    description: 逐字符解释正则表达式结构
+    input_schema:
+      type: object
+      required: []
+      properties:
+        pattern: {type: string}
+
+  - name: util.pdf_extract
+    server: util
+    remote_name: pdf_extract
+    permission: read
+    timeout_seconds: 20
+    description: 用 pdftotext 提取 PDF 正文
+    input_schema:
+      type: object
+      required: []
+      properties:
+        path: {type: string}
+
+  - name: util.pdf_info
+    server: util
+    remote_name: pdf_info
+    permission: read
+    timeout_seconds: 20
+    description: 读取 PDF 页数、尺寸等元信息
+    input_schema:
+      type: object
+      required: []
+      properties:
+        path: {type: string}
+
+  - name: util.docx_inspect
+    server: util
+    remote_name: docx_inspect
+    permission: read
+    timeout_seconds: 20
+    description: 读取 Word 段落与表格数
+    input_schema:
+      type: object
+      required: []
+      properties:
+        path: {type: string}
+
+  - name: util.xlsx_profile
+    server: util
+    remote_name: xlsx_profile
+    permission: read
+    timeout_seconds: 20
+    description: 读取 Excel 工作表结构与预览
+    input_schema:
+      type: object
+      required: []
+      properties:
+        path: {type: string}
+
+  - name: util.pptx_outline
+    server: util
+    remote_name: pptx_outline
+    permission: read
+    timeout_seconds: 20
+    description: 提取 PPT 每页文本大纲
+    input_schema:
+      type: object
+      required: []
+      properties:
+        path: {type: string}
+
+  - name: util.file_tree
+    server: util
+    remote_name: file_tree
+    permission: read
+    timeout_seconds: 20
+    description: 列出目录树（深度与数量受限）
+    input_schema:
+      type: object
+      required: []
+      properties:
+        path: {type: string}
+        depth: {type: integer}
+
+  - name: util.image_info
+    server: util
+    remote_name: image_info
+    permission: read
+    timeout_seconds: 20
+    description: 读取图片格式、尺寸与色彩模式
+    input_schema:
+      type: object
+      required: []
+      properties:
+        path: {type: string}
+
+  - name: util.image_thumb
+    server: util
+    remote_name: image_thumb
+    permission: write
+    timeout_seconds: 20
+    description: 生成缩略图并落盘到 var/capability_probe
+    input_schema:
+      type: object
+      required: []
+      properties:
+        path: {type: string}
+        width: {type: integer}
+        height: {type: integer}
+
+  - name: util.chart_bar
+    server: util
+    remote_name: chart_bar
+    permission: write
+    timeout_seconds: 20
+    description: 用 matplotlib 生成柱状图 PNG
+    input_schema:
+      type: object
+      required: []
+      properties:
+        labels: {type: array}
+        values: {type: array}
+
+  - name: util.report_html
+    server: util
+    remote_name: report_html
+    permission: write
+    timeout_seconds: 20
+    description: 生成 HTML 报告并落盘
+    input_schema:
+      type: object
+      required: []
+      properties:
+        title: {type: string}
+        body: {type: string}
+
+  - name: util.datetime_tool
+    server: util
+    remote_name: datetime_tool
+    permission: read
+    timeout_seconds: 20
+    description: UTC / 本地时间 / 时间戳 / ISO 周
+    input_schema:
+      type: object
+      required: []
+      properties:
+        tz_offset_hours: {type: integer}
+
+  - name: util.sys_info
+    server: util
+    remote_name: sys_info
+    permission: read
+    timeout_seconds: 20
+    description: 读取当前 Python 与主机环境信息
+    input_schema:
+      type: object
+      required: []
+      properties:
+
+  - name: util.env_whitelist
+    server: util
+    remote_name: env_whitelist
+    permission: read
+    timeout_seconds: 20
+    description: 仅列出允许的环境变量名（不暴露取值）
+    input_schema:
+      type: object
+      required: []
+      properties:
+
+  - name: util.calendar_gen
+    server: util
+    remote_name: calendar_gen
+    permission: read
+    timeout_seconds: 20
+    description: 生成指定年月的月历矩阵
+    input_schema:
+      type: object
+      required: []
+      properties:
+        year: {type: integer}
+        month: {type: integer}
+
+  - name: util.math_eval
+    server: util
+    remote_name: math_eval
+    permission: read
+    timeout_seconds: 20
+    description: 安全四则运算求值（AST 白名单）
+    input_schema:
+      type: object
+      required: []
+      properties:
+        expression: {type: string}
+
+  - name: util.unit_convert
+    server: util
+    remote_name: unit_convert
+    permission: read
+    timeout_seconds: 20
+    description: 长度单位换算
+    input_schema:
+      type: object
+      required: []
+      properties:
+        value: {type: integer}
+        from: {type: string}
+        to: {type: string}
+
+  - name: util.geo_solar
+    server: util
+    remote_name: geo_solar
+    permission: read
+    timeout_seconds: 20
+    description: 按纬度与日期估算昼长（纯天文公式）
+    input_schema:
+      type: object
+      required: []
+      properties:
+        latitude: {type: number}
+        day_of_year: {type: integer}
+
+  - name: util.cron_next
+    server: util
+    remote_name: cron_next
+    permission: read
+    timeout_seconds: 20
+    description: 推算 */N 分钟cron的下几次触发时刻
+    input_schema:
+      type: object
+      required: []
+      properties:
+        expression: {type: string}
+
+  - name: util.file_diff
+    server: util
+    remote_name: file_diff
+    permission: read
+    timeout_seconds: 20
+    description: 比对两个文本文件的差异
+    input_schema:
+      type: object
+      required: []
+      properties:
+        left: {type: string}
+        right: {type: string}
+
+  - name: util.dir_checksum
+    server: util
+    remote_name: dir_checksum
+    permission: read
+    timeout_seconds: 20
+    description: 计算目录下文件的聚合校验和
+    input_schema:
+      type: object
+      required: []
+      properties:
+        path: {type: string}
+
+  - name: util.kb_lookup
+    server: util
+    remote_name: kb_lookup
+    permission: read
+    timeout_seconds: 20
+    description: 检索知识库并返回带来源引用的结果
+    input_schema:
+      type: object
+      required: []
+      properties:
+        query: {type: string}
+        top_k: {type: integer}
+
+  - name: browser.browse
+    server: browser
+    transport: local
+    local_handler: "app.tools.browser_tool:browse"
+    permission: read
+    timeout_seconds: 30
+    description: 用真实浏览器（Playwright 驱动 Chromium）渲染网页，返回标题、正文与链接
+    input_schema:
+      type: object
+      required: [url]
+      properties:
+        url: {type: string}
+        limit: {type: integer}
+

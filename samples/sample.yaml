@@ -1,0 +1,6 @@
+name: agent_platform
+version: 1.0.0
+features:
+  - mcp
+  - skills
+  - recovery

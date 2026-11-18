@@ -1,0 +1,31 @@
+name: text_summarize
+version: 1.0.0
+description: 按句子信息密度抽取要点摘要
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 摘要
+  - 提炼
+  - 要点
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    text:
+      type: string
+      description: 参数 text
+    max_points:
+      type: integer
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 文本处理
+color: '#2563eb'
+sample_args:
+  text: 报销制度要求 30 天内提交。审批链路按金额分三档。超时 48 小时自动提醒。结论：必须附发票。
+  max_points: 3
+origin: local

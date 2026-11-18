@@ -1,0 +1,34 @@
+name: compose_report
+version: 0.1.0
+description: 把摘要与统计组装成结构化 Markdown 报告草稿
+entry: skill.py:run
+
+triggers:
+  intents: [content_report]
+  keywords: [报告, 草稿, 汇总成, 生成文档]
+  regex: ["生成.*报告", "撰写.*报告"]
+  require_all: false
+
+inputs:
+  type: object
+  required: [summary]
+  properties:
+    title: {type: string}
+    summary: {type: array, items: {type: string}}
+    stats: {type: object}
+    output_path: {type: string}
+
+dependencies:
+  tools: []
+
+permissions: read
+timeout_seconds: 30
+
+# 技能市场目录元数据（不影响原有加载契约）
+category: 文档与文件
+color: "#d97706"
+origin: local
+sample_args:
+  title: 能力验证报告
+  summary: ["要点一：路由规则由配置文件驱动", "要点二：写操作前必须人工确认"]
+  stats: {字数: 120, 来源: 本地样本}

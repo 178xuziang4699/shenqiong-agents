@@ -1,0 +1,26 @@
+name: datetime_tool
+version: 1.0.0
+description: UTC / 本地时间 / 时间戳 / ISO 周
+entry: skill.py:run
+triggers:
+  intents: []
+  keywords:
+  - 时间
+  - 时区
+  regex: []
+  require_all: false
+inputs:
+  type: object
+  required: []
+  properties:
+    tz_offset_hours:
+      type: integer
+dependencies:
+  tools: []
+permissions: read
+timeout_seconds: 30
+category: 系统与工具
+color: '#475569'
+sample_args:
+  tz_offset_hours: 8
+origin: local
