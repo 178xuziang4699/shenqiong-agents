@@ -1,4 +1,8 @@
-# Agent Platform · 单机多智能体编排平台
+# 深穹智能体 · ShenQiong Agents
+
+> 单机多智能体编排平台 · Agent Platform
+>
+> 仓库地址：https://github.com/178xuziang4699/shenqiong-agents
 
 一个**可运行、可观测、可恢复**的单机多智能体编排平台，附带一套独立部署的**安全运维管理后台**。
 用 Python 3.11 + FastAPI + SQLite 写成，不依赖 Kubernetes、消息队列或外部服务即可跑起来。
@@ -32,8 +36,8 @@
 ### 方式一：本地 Python（最快）
 
 ```bash
-git clone <your-repo-url>.git
-cd agent-platform-opensource
+git clone https://github.com/178xuziang4699/shenqiong-agents.git
+cd shenqiong-agents
 
 python3 -m venv .venv && source .venv/bin/activate
 pip install -r requirements.txt
